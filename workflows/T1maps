@@ -1,0 +1,74 @@
+rule T1map_estimation:
+  input:
+    LL=expand(
+      "mri_dataset/derivatives/{subject}/{session}/{subject}_{session}_acq-looklocker_T1map.nii.gz",
+      subject="sub-01",
+      session=[f"ses-{idx:02d}" for idx in range(1, 6)]
+    ),
+    mixed=expand(
+      "mri_dataset/derivatives/{subject}/{session}/{subject}_{session}_acq-mixed_T1map.nii.gz",
+      subject="sub-01",
+      session=[f"ses-{idx:02d}" for idx in range(1, 6)]
+    ),
+
+rule T1map_estimation_from_LL:
+  input:
+    LL="mri_dataset/{subject}/{session}/anat/{subject}_{session}_acq-looklocker_IRT1.nii.gz",
+    timestamps="mri_dataset/{subject}/{session}/anat/{subject}_{session}_acq-looklocker_IRT1_trigger_times.txt"
+  output:
+    T1raw="mri_dataset/derivatives/{subject}/{session}/{subject}_{session}_acq-looklocker_T1map.nii.gz",
+    R1raw="mri_dataset/derivatives/{subject}/{session}/{subject}_{session}_acq-looklocker_R1map.nii.gz",
+    T1="mri_dataset/derivatives/{subject}/{session}/{subject}_{session}_acq-looklocker_T1map_postprocessed.nii.gz",
+    R1="mri_dataset/derivatives/{subject}/{session}/{subject}_{session}_acq-looklocker_R1map_postprocessed.nii.gz",
+  shell:
+    "python src/gonzo/looklocker_to_T1map.py"
+      " --input {input.LL}"
+      " --timestamps {input.timestamps}"
+      " --output {output.T1raw}"
+      " --postprocessed {output.T1}"
+      " --R1 {output.R1raw}"
+      " --R1_postprocessed {output.R1}"
+
+
+rule T1map_estimation_from_mixed:
+  input:
+    IR="mri_dataset/{subject}/{session}/mixed/{subject}_{session}_acq-mixed_IR-corrected-real.nii.gz",
+    SE="mri_dataset/{subject}/{session}/mixed/{subject}_{session}_acq-mixed_SE-modulus.nii.gz",
+    meta="mri_dataset/{subject}/{session}/mixed/{subject}_{session}_acq-mixed_meta.json"
+  output:
+    T1map="mri_dataset/derivatives/{subject}/{session}/{subject}_{session}_acq-mixed_T1map.nii.gz",
+    T1map_post="mri_dataset/derivatives/{subject}/{session}/{subject}_{session}_acq-mixed_T1map_postprocessed.nii.gz",
+  shell:
+    "python src/gonzo/estimate_mixed_t1maps.py"
+      " --SE {input.SE}"
+      " --IR {input.IR}"
+      " --meta {input.meta}"
+      " --output {output.T1map}"
+      " --postprocessed {output.T1map_post}"
+
+
+rule csfmask:
+  input:
+    "mri_processed_data/{subject}/registered/{subject}_ses-01_T2w_registered.nii.gz",
+  output:
+    "mri_processed_data/{subject}/segmentations/{subject}_seg-csf_binary.nii.gz",
+  shell:
+    "python scripts/mask_csf.py"
+      " --input {input}"
+      " --output {output}"
+
+
+rule hybrid_T1maps:
+  input:
+    ll="mri_processed_data/{subject}/registered/{subject}_{session}_acq-looklocker_T1map_registered.nii.gz",
+    mixed="mri_processed_data/{subject}/registered/{subject}_{session}_acq-mixed_T1map_registered.nii.gz",
+    csfmask="mri_processed_data/{subject}/segmentations/{subject}_seg-csf_binary.nii.gz",
+  output:
+    T1map="mri_processed_data/{subject}/T1maps/{subject}_{session}_T1map.nii.gz",
+  shell:
+    "python src/gonzo/hybrid_t1maps.py"
+      " --ll {input.ll}"
+      " --mixed {input.mixed}"
+      " --csfmask {input.csfmask}"
+      " --output {output}"
+
