@@ -3,6 +3,7 @@ import numpy as np
 from pathlib import Path
 
 
+configfile: "snakeconfig.yaml"
 wildcard_constraints:
   session = "ses-\d{2}"
 
@@ -18,15 +19,14 @@ SESSIONS = {
 }
 config["sessions"] = SESSIONS
 
-
 include: "workflows/T1maps"
 include: "workflows/register"
+include: "workflows/concentration-estimate"
+include: "workflows/dti"
+include: "workflows/mesh-generation"
+include: "workflows/mri2fem"
 # include: "workflows/recon-all"
 # include: "workflows/T1maps"
 # include: "workflows/T1w_signal_intensities"
-include: "workflows/concentration-estimate"
 # include: "workflows/statistics"
-# include: "workflows/mesh-generation"
-# include: "workflows/mri2fem"
-# include: "workflows/dti"
 
