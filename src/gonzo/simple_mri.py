@@ -2,6 +2,7 @@ from pathlib import Path
 import nibabel
 import dataclasses
 import numpy as np
+import numpy.typing as npt
 import re
 
 
@@ -31,35 +32,27 @@ def data_reorientation(mri: SimpleMRI) -> SimpleMRI:
 
     The target coordinate system is still the same (i.e. RAS stays RAS)
     """
-    M = mri.affine[:3, :3]
-    index_order = np.argmax(np.abs(M), axis=1)
-    index_flip = np.sign(np.diag(M[:, index_order])).astype(int)
-    with np.printoptions(precision=3, suppress=True):
-        print(M)
-        print(index_order)
+    A = mri.affine[:3, :3]
+    flips = np.sign(A[np.argmax(np.abs(A), axis=0), np.arange(3)]).astype(int)
+    permutes = np.argmax(np.abs(A), axis=1)
+    offsets = ((1 - flips) // 2) * (np.array(mri.data.shape) - 1)
 
-    data = (
-        mri.data[:: index_flip[0], :: index_flip[1], :: index_flip[2]]
-        .transpose(index_order)
-        .copy()
-    )
-
-    # Reversing index requires translation vector to previous last voxel along
-    # the given axis
-    index_offset = ((1 - index_flip) // 2) * (np.array(mri.data.shape) - 1)
-    F = np.eye(4)
-    F[:3, :3] = np.diag(index_flip)
-    F[:3, 3] = index_offset
+    # Index flip matrix
+    F = np.eye(4, dtype=int)
+    F[:3, :3] = np.diag(flips)
+    F[:3, 3] = offsets
 
     # Index permutation matrix
-    P = np.eye(4)
-    P[:, :3] = P[:, index_order]
+    P = np.eye(4, dtype=int)[[*permutes, 3]]
+    T = mri.affine @ F @ P
 
-    A = mri.affine @ P @ F
-    with np.printoptions(precision=3, suppress=True):
-        print(mri.affine)
-        print(A)
-    return SimpleMRI(data, A)
+    inverse_permutes = np.argmax(P[:3, :3].T, axis=1)
+    data = (
+        mri.data[:: flips[0], :: flips[1], :: flips[2]]
+        .transpose(inverse_permutes)
+        .copy()
+    )
+    return SimpleMRI(data, T)
 
 
 def change_of_coordinates_map(orientation_in: str, orientation_out: str) -> np.ndarray:
@@ -80,12 +73,12 @@ def change_of_coordinates_map(orientation_in: str, orientation_out: str) -> np.n
     order = np.nan * np.empty(len(orientation_in))
     for idx1, char1 in enumerate(orientation_in):
         if char1 not in axes_labels:
-            raise ValueError(f"{char1} not a valid axis label")
+            raise ValueError(f"'{char1}' not a valid axis label")
 
         # Start indexing at 1 to avoid 0 in the sign-function.
         for idx2, char2 in enumerate(orientation_out, start=1):
             if char2 not in axes_labels:
-                raise ValueError(f"{char2} not a valid axis label")
+                raise ValueError(f"'{char2}' not a valid axis label")
             if axes_labels[char1] == axes_labels[char2]:
                 if char1 == char2:
                     order[idx1] = idx2
@@ -96,7 +89,7 @@ def change_of_coordinates_map(orientation_in: str, orientation_out: str) -> np.n
             if idx2 == len(orientation_out):
                 print(char1, char2)
                 raise ValueError(
-                    f"Couldn't find axis in {orientation_out} corresponding to {char1}"
+                    f"Couldn't find axis in '{orientation_out}' corresponding to '{char1}'"
                 )
     index_flip = np.sign(order).astype(int)
     index_order = np.abs(order).astype(int) - 1  # Map back to 0-indexing
@@ -114,7 +107,7 @@ def load_mri(
     dtype: type,
     orient: bool = True,
 ) -> SimpleMRI:
-    suffix_regex = re.compile(r".+(?P<suffix>(\.nii(\.gz|)|\.mg(z|h))")
+    suffix_regex = re.compile(r".+(?P<suffix>(\.nii(\.gz|)|\.mg(z|h)))")
     m = suffix_regex.match(Path(path).name)
     if (m is not None) and (m.groupdict()["suffix"] in (".nii", ".nii.gz")):
         mri = nibabel.nifti1.load(path)
@@ -122,6 +115,7 @@ def load_mri(
         mri = nibabel.freesurfer.mghformat.load(path)
     else:
         raise ValueError(f"Invalid suffix {path}, should be either '.nii', or '.mgz'")
+
     affine = mri.affine
     if affine is None:
         raise RuntimeError("MRI do not contain affine")
@@ -140,4 +134,30 @@ def load_mri_stack(paths: list[Path], dtype: type) -> SimpleMRIStack:
     return SimpleMRIStack(
         data=np.array([mri.data for mri in mris]),
         affine=np.array([mri.affine for mri in mris]),
+    )
+
+
+def save_mri(mri: SimpleMRI, path: Path, dtype: npt.DTypeLike):
+    # TODO: Figure out how to best do nibabel.arrayproxy.ArrayLike-compatible data
+    suffix_regex = re.compile(r".+(?P<suffix>(\.nii(\.gz|)|\.mg(z|h)))")
+    m = suffix_regex.match(Path(path).name)
+    if (m is not None) and (m.groupdict()["suffix"] in (".nii", ".nii.gz")):
+        nii = nibabel.nifti1.Nifti1Image(mri.data.astype(dtype), mri.affine)
+        nibabel.nifti1.save(nii, path)
+    elif (m is not None) and (m.groupdict()["suffix"] in (".mgz", ".mgh")):
+        mgh = nibabel.freesurfer.mghformat.MGHImage(mri.data.astype(dtype), mri.affine)
+        nibabel.freesurfer.mghformat.save(mgh, path)
+    else:
+        raise ValueError(f"Invalid suffix {path}, should be either '.nii', or '.mgz'")
+
+
+def assert_same_space(mri1: SimpleMRI, mri2: SimpleMRI, rtol: float = 1e-5):
+    if mri1.data.shape == mri1.data.shape and np.allclose(
+        mri1.affine, mri2.affine, rtol
+    ):
+        return
+    raise ValueError(
+        f"""MRI's not in same space (relative tolerance {rtol}.
+        Shapes: ({mri1.data.shape}, {mri2.data.shape}),
+        Affines: {mri1.affine}, {mri2.affine}"""
     )

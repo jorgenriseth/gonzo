@@ -34,6 +34,10 @@ def nan_filter_gaussian(
     return out
 
 
+def smooth_extension(D: np.ndarray, sigma: float, truncate: float = 4) -> np.ndarray:
+    return np.where(np.isnan(D), nan_filter_gaussian(D, sigma, truncate), D)
+
+
 def mri_facemask(vol: np.ndarray, smoothing_level=5):
     thresh = skimage.filters.threshold_triangle(vol)
     binary = vol > thresh
@@ -50,13 +54,17 @@ def largest_island(mask: np.ndarray, connectivity: int = 1) -> np.ndarray:
     return newmask == regions[0].label
 
 
-def create_csf_mask(vol: np.ndarray, connectivity: int = 2, use_li: bool = False):
+def create_csf_mask(
+    vol: np.ndarray, connectivity: int = 2, use_li: bool = False
+) -> np.ndarray:
     if use_li:
         thresh = skimage.filters.threshold_li(vol)
         binary = vol > thresh
         binary = largest_island(binary, connectivity=connectivity)
     else:
-        (hist, bins) = np.histogram(vol[vol > 0], bins=512)
+        (hist, bins) = np.histogram(
+            vol[(vol > 0) * (vol < np.quantile(vol, 0.999))], bins=512
+        )
         thresh = skimage.filters.threshold_yen(hist=(hist, bins))
         binary = vol > thresh
         binary = largest_island(binary, connectivity=connectivity)

@@ -1,0 +1,26 @@
+rule segment_refinements:
+  input:
+    reference="mri_processed_data/{subject}/registered/{subject}_ses-01_T1w_registered.nii.gz",
+    segmentation="mri_processed_data/freesurfer/{subject}/mri/aparc+aseg.mgz",
+    csfmask="mri_processed_data/{subject}/segmentations/{subject}_seg-csf_binary.nii.gz",
+  output:
+    refined="mri_processed_data/{subject}/segmentations/{subject}_seg-aparc+aseg_refined.nii.gz",
+    csf_segmentation="mri_processed_data/{subject}/segmentations/{subject}_seg-csf-aparc+aseg.nii.gz",
+    mask="mri_processed_data/{subject}/segmentations/{subject}_seg-intracranial_binary.nii.gz",
+  shell:
+    "python src/gonzo/segmentation_refinement.py"
+    " --fs_seg {input.segmentation}"
+    " --reference {input.reference}"
+    " --csfmask {input.csfmask}"
+    " --output_seg {output.refined}"
+    " --output_csfseg {output.csf_segmentation}"
+    " --intracranial_mask {output.mask}"
+
+
+rule csfmask:
+  input:
+    "mri_processed_data/{subject}/registered/{subject}_ses-01_T2w_registered.nii.gz",
+  output:
+    "mri_processed_data/{subject}/segmentations/{subject}_seg-csf_binary.nii.gz",
+  shell:
+    "python scripts/mask_csf.py {input} {output}"

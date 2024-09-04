@@ -1,3 +1,11 @@
+rule T1maps_all:
+  input:
+    hybrid_T1maps=[
+      f"mri_processed_data/{subject}/T1maps/{subject}_{session}_T1map.nii.gz"
+      for subject in SUBJECTS
+      for session in SESSIONS[subject]
+    ]
+
 rule T1map_estimation:
   input:
     LL=expand(
@@ -32,8 +40,8 @@ rule T1map_estimation_from_LL:
 
 rule T1map_estimation_from_mixed:
   input:
-    IR="mri_dataset/{subject}/{session}/mixed/{subject}_{session}_acq-mixed_IR-corrected-real.nii.gz",
     SE="mri_dataset/{subject}/{session}/mixed/{subject}_{session}_acq-mixed_SE-modulus.nii.gz",
+    IR="mri_dataset/{subject}/{session}/mixed/{subject}_{session}_acq-mixed_IR-corrected-real.nii.gz",
     meta="mri_dataset/{subject}/{session}/mixed/{subject}_{session}_acq-mixed_meta.json"
   output:
     T1map="mri_dataset/derivatives/{subject}/{session}/{subject}_{session}_acq-mixed_T1map.nii.gz",
@@ -47,15 +55,6 @@ rule T1map_estimation_from_mixed:
       " --postprocessed {output.T1map_post}"
 
 
-rule csfmask:
-  input:
-    "mri_processed_data/{subject}/registered/{subject}_ses-01_T2w_registered.nii.gz",
-  output:
-    "mri_processed_data/{subject}/segmentations/{subject}_seg-csf_binary.nii.gz",
-  shell:
-    "python scripts/mask_csf.py"
-      " --input {input}"
-      " --output {output}"
 
 
 rule hybrid_T1maps:

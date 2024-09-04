@@ -1,0 +1,15 @@
+rule concentration_estimate:
+  input:
+    image="mri_processed_data/{subject}/T1maps/{subject}_{session}_T1map.nii.gz",
+    reference="mri_processed_data/{subject}/T1maps/{subject}_ses-01_T1map.nii.gz",
+    mask="mri_processed_data/{subject}/{subject}_mask-intracranial.nii.gz"
+  output:
+    "mri_processed_data/{subject}/concentrations/{subject}_{session}_concentration.nii.gz"
+  shell:
+    "python src/gonzo/estimate_concentration.py"
+      " --input {input.image}"
+      " --reference {input.reference}"
+      " --output {output}"
+      " --r1 0.0045"
+      " --mask {input.mask}"
+
