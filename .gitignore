@@ -2,6 +2,10 @@
 mri_dataset
 mri_processed_data
 
+*.xdmf
+*.h5
+*.hdf
+
 
 
 # Byte-compiled / optimized / DLL files

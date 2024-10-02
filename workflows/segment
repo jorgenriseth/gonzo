@@ -1,12 +1,13 @@
 rule segment_refinements:
   input:
     reference="mri_processed_data/{subject}/registered/{subject}_ses-01_T1w_registered.nii.gz",
-    segmentation="mri_processed_data/freesurfer/{subject}/mri/aparc+aseg.mgz",
+    segmentation="mri_processed_data/freesurfer/{subject}/mri/{seg}.mgz",
     csfmask="mri_processed_data/{subject}/segmentations/{subject}_seg-csf_binary.nii.gz",
   output:
-    refined="mri_processed_data/{subject}/segmentations/{subject}_seg-aparc+aseg_refined.nii.gz",
-    csf_segmentation="mri_processed_data/{subject}/segmentations/{subject}_seg-csf-aparc+aseg.nii.gz",
-    mask="mri_processed_data/{subject}/segmentations/{subject}_seg-intracranial_binary.nii.gz",
+    refined="mri_processed_data/{subject}/segmentations/{subject}_seg-{seg}_refined.nii.gz",
+    csf_segmentation="mri_processed_data/{subject}/segmentations/{subject}_seg-csf-{seg}.nii.gz",
+  params:
+    label_smoothing = 1.0
   shell:
     "python src/gonzo/segmentation_refinement.py"
     " --fs_seg {input.segmentation}"
@@ -14,7 +15,18 @@ rule segment_refinements:
     " --csfmask {input.csfmask}"
     " --output_seg {output.refined}"
     " --output_csfseg {output.csf_segmentation}"
-    " --intracranial_mask {output.mask}"
+    " --label_smoothing {params.label_smoothing}"
+
+rule intracranial_mask:
+  input:
+    csf="mri_processed_data/{subject}/segmentations/{subject}_seg-csf-aseg.nii.gz",
+    brain="mri_processed_data/{subject}/segmentations/{subject}_seg-aseg_refined.nii.gz",
+  output:
+    "mri_processed_data/{subject}/segmentations/{subject}_seg-intracranial_binary.nii.gz",
+  shell:
+    "python scripts/segmentation_refinement.py"
+    " --csf_mask {input.csf}"
+    " --brain_mask {input.brain}"
 
 
 rule csfmask:
@@ -24,3 +36,26 @@ rule csfmask:
     "mri_processed_data/{subject}/segmentations/{subject}_seg-csf_binary.nii.gz",
   shell:
     "python scripts/mask_csf.py {input} {output}"
+
+
+rule orbital_refroi:
+  input: 
+    T1w = lambda wc: [
+      f"mri_processed_data/{{subject}}/registered/{{subject}}_{session}_T1w_registered.nii.gz"
+      for session in SESSIONS[wc.subject]
+    ],
+    segmentation= "mri_processed_data/{subject}/segmentations/{subject}_seg-aparc+aseg_refined.nii.gz",
+  output:
+    "mri_processed_data/{subject}/segmentations/{subject}_seg-refroi-left-orbital_binary.nii.gz",
+    "mri_processed_data/{subject}/segmentations/{subject}_seg-refroi-right-orbital_binary.nii.gz",
+  shell:
+    "python gmri2fem/mriprocessing/orbital_refroi.py"
+      " --T1w_dir $(dirname '{input.T1w[0]}')"
+      " --segmentation {input.segmentation}"
+      " --output {output[0]}"
+      " --side 'left' && "
+    "python gmri2fem/mriprocessing/orbital_refroi.py"
+      " --T1w_dir $(dirname '{input.T1w[0]}')"
+      " --segmentation {input.segmentation}"
+      " --output {output[1]}"
+      " --side 'right'"

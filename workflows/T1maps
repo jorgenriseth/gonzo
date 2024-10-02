@@ -55,6 +55,16 @@ rule T1map_estimation_from_mixed:
       " --postprocessed {output.T1map_post}"
 
 
+rule mixed_T1_to_R1:
+  input:
+    T1map="mri_dataset/derivatives/{subject}/{session}/{subject}_{session}_acq-mixed_T1map.nii.gz",
+    T1map_post="mri_dataset/derivatives/{subject}/{session}/{subject}_{session}_acq-mixed_T1map_postprocessed.nii.gz",
+  output:
+    R1map="mri_dataset/derivatives/{subject}/{session}/{subject}_{session}_acq-mixed_R1map.nii.gz",
+    R1map_post="mri_dataset/derivatives/{subject}/{session}/{subject}_{session}_acq-mixed_R1map_postprocessed.nii.gz",
+  shell:
+    "python scripts/T1_to_R1.py {input.T1map} {output.R1map} --t1-low 200 && "
+    "python scripts/T1_to_R1.py {input.T1map_post} {output.R1map_post} --t1-low 200"
 
 
 rule hybrid_T1maps:

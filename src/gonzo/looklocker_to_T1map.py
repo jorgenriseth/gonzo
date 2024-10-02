@@ -1,8 +1,7 @@
-import re
 import warnings
 from functools import partial
 from pathlib import Path
-from typing import Callable, Any, Optional
+from typing import Optional
 
 import nibabel
 import numpy as np
@@ -12,7 +11,6 @@ import tqdm
 from scipy.optimize import OptimizeWarning
 
 from gonzo.utils import nan_filter_gaussian, mri_facemask
-from gonzo.simple_mri import load_mri
 
 
 def f(t, x1, x2, x3):
@@ -53,15 +51,15 @@ def fit_voxel(time_s: np.ndarray, pbar, m: np.ndarray) -> np.ndarray:
 def estimate_t1map(
     t_data: np.ndarray, D: np.ndarray, affine: np.ndarray
 ) -> nibabel.nifti1.Nifti1Image:
-    mask = mri_facemask(D[0])
-    valid_voxels = (np.nanmax(D, axis=0) > 0) * mask
+    mask = mri_facemask(D[..., 0])
+    valid_voxels = (np.nanmax(D, axis=-1) > 0) * mask
 
     D_normalized = np.nan * np.zeros_like(D)
-    D_normalized[:, valid_voxels] = (
-        D[:, valid_voxels] / np.nanmax(D, axis=0)[valid_voxels]
+    D_normalized[valid_voxels] = (
+        D[valid_voxels] / np.nanmax(D, axis=-1)[valid_voxels, np.newaxis]
     )
     voxel_mask = np.array(np.where(valid_voxels)).T
-    Dmasked = np.array([D_normalized[:, i, j, k] for (i, j, k) in voxel_mask])
+    Dmasked = np.array([D_normalized[i, j, k] for (i, j, k) in voxel_mask])
 
     with tqdm.tqdm(total=len(Dmasked)) as pbar:
         voxel_fitter = partial(fit_voxel, t_data, pbar)
@@ -75,7 +73,7 @@ def estimate_t1map(
     )
 
     I, J, K = voxel_mask.T
-    T1map = np.nan * np.zeros_like(D[0])
+    T1map = np.nan * np.zeros_like(D[..., 0])
     T1map[I, J, K] = (x2 / x3) ** 2 * 1000.0  # convert to ms
     return nibabel.nifti1.Nifti1Image(T1map.astype(np.single), affine)
 
@@ -149,10 +147,9 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     LL_nii = nibabel.nifti1.load(args.input)
-    mri = load_mri(args.input, np.single)
     time = np.loadtxt(args.timestamps) / 1000
-    D = mri.data.transpose(3, 0, 1, 2)
-    T1map_nii = estimate_t1map(time, D, mri.affine)
+    D = LL_nii.get_fdata("unchanged").astype(np.single)  # .transpose(3, 0, 1, 2)
+    T1map_nii = estimate_t1map(time, D, LL_nii.affine)
 
     args.output.parent.mkdir(exist_ok=True, parents=True)
     nibabel.nifti1.save(T1map_nii, args.output)
@@ -162,7 +159,7 @@ if __name__ == "__main__":
         nibabel.nifti1.save(R1, args.R1)
 
     if args.postprocessed is not None:
-        mask = mri_facemask(D[0])
+        mask = mri_facemask(D[..., 0])
         postprocessed = postprocess_T1map(
             T1map_nii,
             args.T1_low,

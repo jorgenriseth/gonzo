@@ -5,6 +5,7 @@ from typing import Optional
 import nibabel
 import numpy as np
 import scipy
+import skimage
 from numpy.lib.stride_tricks import sliding_window_view
 
 from gonzo.utils import create_csf_mask
@@ -50,21 +51,29 @@ def estimate_T1_mixed(
     return nii
 
 
-def filtering(vol):
-    v = sliding_window_view(vol, (11, 11))
+def outlier_filter(
+    vol: np.ndarray, window_size: int, threshold: float = 3
+) -> np.ndarray:
+    v = sliding_window_view(vol, [window_size] * vol.ndim)
     m = np.nanmedian(v, axis=(-2, -1))
     s = np.nanstd(v, axis=(-2, -1))
     med = np.zeros_like(vol)
-    med[5:-5, 5:-5] = m
+    med[-window_size // 2 : window_size // 2, -window_size // 2 : window_size // 2] = m
 
-    stand = np.zeros_like(vol)
-    stand[5:-5, 5:-5] = s
+    std = np.zeros_like(vol)
+    std[-window_size // 2 : window_size // 2, -window_size // 2 : window_size // 2] = s
 
-    filter = (vol - med) / stand > 3
-    return filter
+    return np.abs(vol - med) / std > threshold
 
 
-def estimate_main(
+def mask_csf(se: Path) -> np.ndarray:
+    SE_mri = load_mri(se, np.single)
+    mask = create_csf_mask(SE_mri.data, use_li=True)
+    mask = skimage.morphology.binary_erosion(mask)
+    return mask
+
+
+def main(
     se: Path,
     ir: Path,
     meta: Path,
@@ -75,8 +84,7 @@ def estimate_main(
     nibabel.nifti1.save(T1map_nii, output)
 
     if postprocessed is not None:
-        SE_mri = load_mri(se, np.single)
-        mask = create_csf_mask(SE_mri.data, use_li=True)
+        mask = mask_csf(se)
         masked_T1map = T1map_nii.get_fdata(dtype=np.single)
         masked_T1map[~mask] = np.nan
         masked_T1map_nii = nibabel.nifti1.Nifti1Image(
@@ -88,4 +96,4 @@ def estimate_main(
 if __name__ == "__main__":
     import typer
 
-    typer.run(estimate_main)
+    typer.run(main)
