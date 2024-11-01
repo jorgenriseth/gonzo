@@ -5,7 +5,7 @@ from typing import Any, Optional
 import click
 import numpy as np
 import pyvista as pv
-from gonzo.simple_mri import load_mri
+from simple_mri import load_mri
 
 from brainmeshing.surfaces import (
     TaubinParams,

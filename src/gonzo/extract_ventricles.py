@@ -2,7 +2,7 @@ import pyvista as pv
 import numpy as np
 from pathlib import Path
 
-from gonzo.simple_mri import load_mri, SimpleMRI, save_mri, assert_same_space
+from simple_mri import load_mri, SimpleMRI, save_mri, assert_same_space
 
 import skimage.morphology as skim
 import skimage

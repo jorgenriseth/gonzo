@@ -36,7 +36,7 @@ from nibabel.affines import apply_affine
 
 import pantarei as pr
 
-from gonzo.simple_mri import SimpleMRI
+from simple_mri import SimpleMRI
 from gonzo.clean_dti_data import extend_to_9_component_array
 
 

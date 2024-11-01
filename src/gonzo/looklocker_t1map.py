@@ -1,9 +1,9 @@
+import click
 import warnings
 from functools import partial
 from pathlib import Path
 from typing import Optional
 
-import nibabel
 import numpy as np
 import scipy
 import skimage
@@ -11,6 +11,9 @@ import tqdm
 from scipy.optimize import OptimizeWarning
 
 from gonzo.utils import nan_filter_gaussian, mri_facemask
+from simple_mri import SimpleMRI, load_mri, save_mri
+
+T1_ROOF = 10000
 
 
 def f(t, x1, x2, x3):
@@ -48,9 +51,7 @@ def fit_voxel(time_s: np.ndarray, pbar, m: np.ndarray) -> np.ndarray:
     return popt
 
 
-def estimate_t1map(
-    t_data: np.ndarray, D: np.ndarray, affine: np.ndarray
-) -> nibabel.nifti1.Nifti1Image:
+def estimate_t1map(t_data: np.ndarray, D: np.ndarray, affine: np.ndarray) -> SimpleMRI:
     mask = mri_facemask(D[..., 0])
     valid_voxels = (np.nanmax(D, axis=-1) > 0) * mask
 
@@ -75,19 +76,19 @@ def estimate_t1map(
     I, J, K = voxel_mask.T
     T1map = np.nan * np.zeros_like(D[..., 0])
     T1map[I, J, K] = (x2 / x3) ** 2 * 1000.0  # convert to ms
-    return nibabel.nifti1.Nifti1Image(T1map.astype(np.single), affine)
+    T1map = np.minimum(T1map, T1_ROOF)
+    return SimpleMRI(T1map.astype(np.single), affine)
 
 
 def postprocess_T1map(
-    T1map_mri: nibabel.nifti1.Nifti1Image,
+    T1map_mri: SimpleMRI,
     T1_lo: float,
     T1_hi: float,
     radius: int = 10,
     erode_dilate_factor: float = 1.3,
     mask: Optional[np.ndarray] = None,
-) -> nibabel.nifti1.Nifti1Image:
-    T1map = T1map_mri.get_fdata(dtype=np.single)
-
+) -> SimpleMRI:
+    T1map = T1map_mri.data.copy()
     if mask is None:
         # Create mask for largest island.
         mask = skimage.measure.label(np.isfinite(T1map))
@@ -124,49 +125,29 @@ def postprocess_T1map(
         print(f"Filling in {fill_mask.sum()} voxels within the mask.")
         T1map[fill_mask] = nan_filter_gaussian(T1map, 1.0)[fill_mask]
         fill_mask = np.isnan(T1map) * mask
-    return nibabel.nifti1.Nifti1Image(T1map, T1map_mri.affine)
+    return SimpleMRI(T1map, T1map_mri.affine)
 
 
-def T1_to_R1(T1map_mri: nibabel.nifti1.Nifti1Image, scale: float = 1000):
-    T1map = T1map_mri.get_fdata(dtype=np.single)
-    return nibabel.nifti1.Nifti1Image(scale / T1map, T1map_mri.affine)
+@click.command()
+@click.option("--input", type=Path, required=True)
+@click.option("--timestamps", type=Path, required=True)
+@click.option("--output", type=Path, required=True)
+@click.option("--T1_low", type=float, default=1)
+@click.option("--T1_high", type=float, default=float("Inf"))
+@click.option("--postprocessed", type=Path)
+@click.option("--R1", type=Path)
+@click.option("--R1_postprocessed", type=Path)
+def looklocker_t1map(
+    input,
+    timestamps,
+    output,
+):
+    time = np.loadtxt(timestamps) / 1000
+    LL_mri = load_mri(input, dtype=np.single)
+    T1map_mri = estimate_t1map(time, LL_mri.data, LL_mri.affine)
+    output.parent.mkdir(exist_ok=True, parents=True)
+    save_mri(T1map_mri, output, dtype=np.single)
 
 
 if __name__ == "__main__":
-    import argparse
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--input", type=Path, required=True)
-    parser.add_argument("--timestamps", type=Path, required=True)
-    parser.add_argument("--output", type=Path, required=True)
-    parser.add_argument("--T1_low", type=int, default=150)
-    parser.add_argument("--T1_hi", type=int, default=5500)
-    parser.add_argument("--postprocessed", type=Path)
-    parser.add_argument("--R1", type=Path)
-    parser.add_argument("--R1_postprocessed", type=Path)
-    args = parser.parse_args()
-
-    LL_nii = nibabel.nifti1.load(args.input)
-    time = np.loadtxt(args.timestamps) / 1000
-    D = LL_nii.get_fdata("unchanged").astype(np.single)  # .transpose(3, 0, 1, 2)
-    T1map_nii = estimate_t1map(time, D, LL_nii.affine)
-
-    args.output.parent.mkdir(exist_ok=True, parents=True)
-    nibabel.nifti1.save(T1map_nii, args.output)
-
-    if args.R1 is not None:
-        R1 = T1_to_R1(T1map_nii)
-        nibabel.nifti1.save(R1, args.R1)
-
-    if args.postprocessed is not None:
-        mask = mri_facemask(D[..., 0])
-        postprocessed = postprocess_T1map(
-            T1map_nii,
-            args.T1_low,
-            args.T1_hi,
-            mask=mask,
-        )
-        nibabel.nifti1.save(postprocessed, args.postprocessed)
-        if args.R1_postprocessed is not None:
-            R1_post = T1_to_R1(postprocessed)
-            nibabel.nifti1.save(R1_post, args.R1_postprocessed)
+    looklocker_t1map()

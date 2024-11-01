@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Literal, Optional
 
 import numpy as np
 import scipy as sp
@@ -117,3 +117,51 @@ def nearest_neighbour(
     num_nan_values = (~np.isfinite(D_out[i, j, k])).sum()
     assert num_nan_values == 0
     return D_out
+
+
+def plot_orient(
+    volume: np.ndarray, plane: Literal["sagittal", "coronal", "axial"], idx: int
+) -> np.ndarray:
+    if plane == "sagittal":
+        return volume[idx, :, ::-1].T
+    elif plane == "coronal":
+        return volume[:, idx, ::-1].T
+    elif plane == "axial":
+        return volume[:, ::-1, idx].T
+    else:
+        raise ValueError(
+            f"Invlid plane '{plane}', should be one of 'sagittal', 'coronal', 'axial'"
+        )
+
+
+def session_range(*args):
+    return [f"ses-{idx+1:02d}" for idx in range(*args)]
+
+
+def axial_dilation_footprint(ndim, axis):
+    footprint = [1] * ndim
+    footprint[axis] = 3
+    return np.ones(footprint)
+
+
+def connectivity_matrix(arr):
+    labels = np.unique(arr)
+    n_labels = len(labels)
+    K = np.zeros((n_labels, n_labels))
+    for i, label_i in enumerate(labels):
+        mask_i = arr == label_i
+        axially_dilated_masks = [
+            skimage.morphology.dilation(
+                mask_i, footprint=np.array(axial_dilation_footprint(arr.ndim, axis))
+            )
+            for axis in range(arr.ndim)
+        ]
+        K[i, i] = mask_i.sum()
+        for j, label_j in enumerate(labels[i + 1 :], start=i + 1):
+            mask_j = arr == label_j
+            interfaces = [(dilated * mask_j).sum() for dilated in axially_dilated_masks]
+            print(interfaces)
+            K[i, j] = sum(interfaces)
+
+    K += np.triu(K, k=1).T
+    return {"labels": labels, "connectivity": K}

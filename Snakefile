@@ -1,8 +1,18 @@
 import os
 import numpy as np
 from pathlib import Path
+shell.executable("bash")
 
 configfile: "snakeconfig.yaml"
+container: "singularity/Singularity"
+
+if DeploymentMethod.APPTAINER in workflow.deployment_settings.deployment_method:
+  shell.prefix(
+    "set -eo pipefail; "
+    + "source /opt/conda/etc/profile.d/conda.sh && "
+    + "conda activate $CONDA_ENV_NAME && "
+    #    + "ls -l && "
+  )
 
 wildcard_constraints:
   session = r"ses-\d{2}",
@@ -26,13 +36,13 @@ SESSIONS = {
 config["sessions"] = SESSIONS
 config["FS_DIR"] = "mri_processed_data/freesurfer/{subject}"
 
-include: "workflows/T1maps"
-include: "workflows/T1w"
-include: "workflows/register"
-include: "workflows/segment"
-include: "workflows/concentration-estimate"
-include: "workflows/statistics"
-include: "workflows/dti"
-include: "workflows/mesh-generation"
-include: "workflows/mri2fem"
-include: "workflows/recon-all"
+include: "workflows/T1maps.smk"
+include: "workflows/T1w.smk"
+include: "workflows/register.smk"
+include: "workflows/segment.smk"
+include: "workflows/concentration.smk-estimate"
+include: "workflows/statistics.smk"
+include: "workflows/dti.smk"
+include: "workflows/mesh.smk-generation"
+include: "workflows/mri2fem.smk"
+include: "workflows/recon.smk-all"

@@ -4,7 +4,7 @@ rule extract_ventricles:
   output:
     "mri_processed_data/{subject}/modeling/surfaces/ventricles.stl"
   shell:
-    "brainmeshing ventricle-surf"
+    "gmri2fem brainmeshing ventricle-surf"
     " -i {input}"
     " -o {output}"
     " --min_radius 2"
@@ -24,7 +24,7 @@ rule separate_white_and_gray:
     rh_pial="mri_processed_data/{subject}/modeling/surfaces/rh_pial.stl",
     rh_white="mri_processed_data/{subject}/modeling/surfaces/rh_white.stl",
   shell:
-    "brainmeshing separate-surfaces"
+    "gmri2fem brainmeshing separate-surfaces"
     " --fs_dir $(dirname {input.lh_pial})/.."
     " --outputdir $(dirname {output[0]})"
 
@@ -37,7 +37,7 @@ rule preprocess_white_surface:
   output:
     "mri_processed_data/{subject}/modeling/surfaces/white.stl"
   shell:
-    "brainmeshing wm-surfaces"
+    "gmri2fem brainmeshing wm-surfaces"
     " --inputdir $(dirname {input.lh_white})"
     " --seg {input.seg}"
     " --ventricles {input.ventricles}"
@@ -56,7 +56,7 @@ rule preprocess_gray_matter_surface:
     rh="mri_processed_data/{subject}/modeling/surfaces/rh_pial_novent.stl",
     subcort="mri_processed_data/{subject}/modeling/surfaces/subcortical_gm.stl"
   shell:
-    "brainmeshing gm-surfaces"
+    "gmri2fem brainmeshing gm-surfaces"
     " --inputdir $(dirname {input.lh_pial})"
     " --seg {input.seg}"
     " --ventricles {input.ventricles}"
@@ -72,7 +72,7 @@ rule generate_mesh:
     hdf="mri_processed_data/{subject}/modeling/resolution{res}/mesh.hdf",
     xdmf="mri_processed_data/{subject}/modeling/resolution{res}/mesh_xdmfs/subdomains.xdmf"
   shell:
-    "brainmeshing meshgen"
+    "gmri2fem brainmeshing meshgen"
     " --surfacedir $(dirname {input[0]})"
     " --resolution {wildcards.res}"
     " --output {output.hdf}"
@@ -85,5 +85,5 @@ rule mesh_segmentation:
   output:
     "mri_processed_data/{subject}/modeling/resolution{res}/mesh_aparc.hdf"
   shell:
-    "brainmeshing subdomains"
+    "gmri2fem brainmeshing subdomains"
     " {input} {output}"

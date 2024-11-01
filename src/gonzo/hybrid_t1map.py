@@ -1,5 +1,6 @@
 from pathlib import Path
 
+import click
 import nibabel.nifti1 as nifti1
 
 
@@ -21,15 +22,15 @@ def T1_hybridization(
     return nifti1.Nifti1Image(hybrid, affine=ll_mri.affine, header=ll_mri.header)
 
 
+@click.command()
+@click.option("--csfmask", type=Path, required=True)
+@click.option("--ll", type=Path, required=True)
+@click.option("--mixed", type=Path, required=True)
+@click.option("--output", type=Path, required=True)
+def hybrid_t1map(csfmask, ll, mixed, output):
+    hybrid = T1_hybridization(ll, mixed, csfmask, mixed_threshold=1500)
+    nifti1.save(hybrid, output)
+
+
 if __name__ == "__main__":
-    import argparse
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--csfmask", type=Path, required=True)
-    parser.add_argument("--ll", type=Path, required=True)
-    parser.add_argument("--mixed", type=Path, required=True)
-    parser.add_argument("--output", type=Path, required=True)
-    args = parser.parse_args()
-
-    hybrid = T1_hybridization(args.ll, args.mixed, args.csfmask, mixed_threshold=1500)
-    nifti1.save(hybrid, args.output)
+    hybrid_t1map()

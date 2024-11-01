@@ -4,7 +4,7 @@ import numpy as np
 from pathlib import Path
 from loguru import logger
 
-from gonzo.simple_mri import data_reorientation, change_of_coordinates_map, SimpleMRI
+from simple_mri import data_reorientation, change_of_coordinates_map, SimpleMRI
 
 VOLUME_LABELS = [
     "IR-modulus",

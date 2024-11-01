@@ -7,7 +7,7 @@ import click
 import numpy as np
 import matplotlib.pyplot as plt
 
-from gonzo.simple_mri import load_mri, SimpleMRI, save_mri
+from simple_mri import load_mri, SimpleMRI, save_mri
 
 
 def construct_tensor_from_eigs(dti_folder: Path, prefix_pattern: str) -> SimpleMRI:

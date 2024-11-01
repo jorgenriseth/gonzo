@@ -6,11 +6,11 @@ rule T1w_signal_intensity_increase:
   output:
     "mri_processed_data/{subject}/T1w_signal_difference/{subject}_{session}_T1w_signal-difference.nii.gz",
   shell:
-    "python gmri2fem/mriprocessing/t1w_signal_increase.py"
-      " --reference {input.reference}"
-      " --image {input.image}"
-      " --mask {input.mask}"
-      " --output {output}"
+    "gmri2fem mri T1w_sigdiff"
+    " --reference {input.reference}"
+    " --image {input.image}"
+    " --mask {input.mask}"
+    " --output {output}"
 
 
 rule normalize_T1w:
@@ -20,7 +20,7 @@ rule normalize_T1w:
     output:
         "mri_processed_data/{subject}/T1w_normalized/{subject}_{session}_T1w_normalized.nii.gz"
     shell:
-        "python gmri2fem/mriprocessing/normalize_images.py"
+        "gmri2fem mri T1w_normalize"
         " --image {input.image}"
         " --refroi {input.refroi}"
         " --output {output}"

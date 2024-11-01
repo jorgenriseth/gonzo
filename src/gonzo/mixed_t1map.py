@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 from typing import Optional
 
+import click
 import nibabel
 import numpy as np
 import scipy
@@ -9,7 +10,7 @@ import skimage
 from numpy.lib.stride_tricks import sliding_window_view
 
 from gonzo.utils import create_csf_mask
-from gonzo.simple_mri import load_mri
+from simple_mri import load_mri
 
 
 def T1_lookup_table(
@@ -73,16 +74,17 @@ def mask_csf(se: Path) -> np.ndarray:
     return mask
 
 
-def main(
+def process_mixed_t1map(
     se: Path,
     ir: Path,
     meta: Path,
     output: Path,
+    t1_low: float = 1.0,
+    t1_high: float = float("Inf"),
     postprocessed: Optional[Path] = None,
 ):
-    T1map_nii = estimate_T1_mixed(se, ir, meta, T1_low=1, T1_hi=10000)
+    T1map_nii = estimate_T1_mixed(se, ir, meta, T1_low=t1_low, T1_hi=t1_high)
     nibabel.nifti1.save(T1map_nii, output)
-
     if postprocessed is not None:
         mask = mask_csf(se)
         masked_T1map = T1map_nii.get_fdata(dtype=np.single)
@@ -93,7 +95,28 @@ def main(
         nibabel.nifti1.save(masked_T1map_nii, postprocessed)
 
 
-if __name__ == "__main__":
-    import typer
+def mixed_t1_postprocessing(se: Path, t1: Path, output: Path):
+    T1map_nii = nibabel.nifti1.load(t1)
+    mask = mask_csf(se)
+    masked_T1map = T1map_nii.get_fdata(dtype=np.single)
+    masked_T1map[~mask] = np.nan
+    masked_T1map_nii = nibabel.nifti1.Nifti1Image(
+        masked_T1map, T1map_nii.affine, T1map_nii.header
+    )
+    nibabel.nifti1.save(masked_T1map_nii, output)
 
-    typer.run(main)
+
+@click.command()
+@click.option("--SE", type=Path, required=True)
+@click.option("--IR", type=Path, required=True)
+@click.option("--meta", type=Path, required=True)
+@click.option("--output", type=Path, required=True)
+@click.option("--t1_low", type=float, default=1.0)
+@click.option("--t1_high", type=float, default=float("Inf"))
+@click.option("--postprocessed", type=Path, required=True)
+def mixed_t1map(**kwargs):
+    process_mixed_t1map(**kwargs)
+
+
+if __name__ == "__main__":
+    mixed_t1map()

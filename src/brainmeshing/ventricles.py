@@ -6,7 +6,7 @@ import numpy as np
 import pyvista as pv
 import scipy
 import skimage
-from gonzo.simple_mri import SimpleMRI, load_mri
+from simple_mri import SimpleMRI, load_mri
 from gonzo.utils import segmentation_smoothing
 
 V3 = 14
@@ -33,6 +33,18 @@ def main(input: Path, output: Path, **kwargs):
     Path(output).parent.mkdir(exist_ok=True)
     seg_mri = load_mri(input, dtype=np.int16)
     surf = extract_ventricle_surface(seg_mri, **kwargs)
+    surf.compute_normals(
+        cell_normals=True,
+        point_normals=True,
+        split_vertices=False,
+        flip_normals=False,
+        consistent_normals=True,
+        auto_orient_normals=True,
+        non_manifold_traversal=True,
+        feature_angle=30.0,
+        inplace=True,
+        progress_bar=False,
+    )
     pv.save_meshio(output, surf)
 
 

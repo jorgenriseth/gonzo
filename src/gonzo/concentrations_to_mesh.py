@@ -11,7 +11,7 @@ import pantarei as pr
 from pantarei import FenicsStorage, fenicsstorage2xdmf
 
 from gonzo.utils import apply_affine, nan_filter_gaussian
-from gonzo.simple_mri import load_mri, SimpleMRI
+from simple_mri import load_mri, SimpleMRI
 
 
 def extract_sequence_timestamps(

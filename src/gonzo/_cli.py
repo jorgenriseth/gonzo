@@ -1,34 +1,37 @@
 # ruff: disable=F401
-from pathlib import Path
-
 import click
+
+from gonzo.looklocker_t1map import looklocker_t1map
+from gonzo.mixed_t1map import mixed_t1map
+from gonzo.hybrid_t1map import hybrid_t1map
+from gonzo.t1maps import T1_to_R1, looklocker_t1_postprocessing
+from gonzo.t1_weighted import T1w_sigdiff, T1w_normalize
+from gonzo.masking import mask_intracranial, mask_csf
+from gonzo.segmentation_refinement import refine
+from gonzo.orbital_refroi import orbital_refroi
 
 
 @click.group()
-def cli():
+def mri():
     pass
 
 
-@cli.command()
-@click.option("--SE", type=Path, required=True, help="Path to SpinEcho-image")
-@click.option(
-    "--IR", type=Path, required=True, help="Path to InversionRecovery real image"
-)  # noqa: F401
-@click.option(
-    "--meta",
-    type=Path,
-    required=True,
-    help="Path to mixed.json file with TR, TI and TE",
-)
-@click.option("--output", type=Path, required=True, help="Output path")
-@click.option(
-    "--postprocessed", type=Path, required=True, help="Path to postprocessed output"
-)
-def T1map_mixed(SE: Path, IR: Path, meta: Path, output: Path, postprocessed: Path):
-    from gonzo.estimate_mixed_t1maps import main as mixed_t1map
+mri.add_command(mixed_t1map)
+mri.add_command(looklocker_t1map)
+mri.add_command(looklocker_t1_postprocessing)
+mri.add_command(hybrid_t1map)
+mri.add_command(T1_to_R1)
 
-    mixed_t1map(SE, IR, meta, output, postprocessed)
+mri.add_command(T1w_sigdiff)
+mri.add_command(T1w_normalize)
 
 
-if __name__ == "__main__":
-    cli()
+@click.group()
+def seg():
+    pass
+
+
+seg.add_command(refine)
+seg.add_command(mask_intracranial)
+seg.add_command(mask_csf)
+seg.add_command(orbital_refroi)

@@ -6,8 +6,14 @@ from typing import Optional
 import numpy as np
 import matplotlib.pyplot as plt
 
-from gonzo.simple_mri import SimpleMRI, load_mri, save_mri
+from simple_mri import SimpleMRI, load_mri, save_mri
 import click
+
+
+# TODO: Incorporate to allow multiple files resliced simultaneously
+def moving_pair(args):
+    assert len(args) == 2, f"Got {len(args)} arguments, should only have two"
+    return f" -rm {args[0]} {args[1]} "
 
 
 @click.command()

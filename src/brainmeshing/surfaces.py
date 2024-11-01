@@ -9,7 +9,7 @@ import numpy as np
 import pyvista as pv
 import SVMTK as svmtk
 from gonzo.segmentation_groups import default_segmentation_groups
-from gonzo.simple_mri import SimpleMRI
+from simple_mri import SimpleMRI
 from gonzo.utils import grow_restricted
 from loguru import logger
 

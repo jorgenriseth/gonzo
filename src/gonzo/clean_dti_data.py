@@ -4,7 +4,7 @@ from pathlib import Path
 import numpy as np
 import scipy
 
-from gonzo.simple_mri import SimpleMRI, load_mri, save_mri
+from simple_mri import SimpleMRI, load_mri, save_mri
 
 
 def clean_dti_data(dti_file: Path, mask_file: Path, out_file: Path):

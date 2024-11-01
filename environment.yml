@@ -1,0 +1,28 @@
+name: gonzo
+channels:
+  - conda-forge
+  - bioconda
+  - jorgenriseth
+dependencies:
+  - python >= 3.7, <3.12
+  - pip
+  - h5py
+  - fenics
+  - matplotlib
+  - scipy
+  - numpy
+  - jupyter
+  - nibabel
+  - pydicom
+  - scikit-image
+  - snakemake
+  - pint
+  - meshio
+  - svmtk
+  - pantarei
+  - loguru
+  - tqdm
+  - typer
+  - click
+  - pyvista
+  - pymeshfix

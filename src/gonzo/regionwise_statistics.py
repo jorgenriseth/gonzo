@@ -7,7 +7,7 @@ import pandas as pd
 from tqdm import tqdm
 
 from gonzo.segmentation_groups import default_segmentation_groups
-from gonzo.simple_mri import load_mri, assert_same_space
+from simple_mri import load_mri, assert_same_space
 
 
 def create_dataframe(

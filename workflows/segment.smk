@@ -9,7 +9,7 @@ rule segment_refinements:
   params:
     label_smoothing = 1.0
   shell:
-    "python src/gonzo/segmentation_refinement.py"
+    "gmri2fem seg refine"
     " --fs_seg {input.segmentation}"
     " --reference {input.reference}"
     " --csfmask {input.csfmask}"
@@ -24,10 +24,9 @@ rule intracranial_mask:
   output:
     "mri_processed_data/{subject}/segmentations/{subject}_seg-intracranial_binary.nii.gz",
   shell:
-    "python scripts/segmentation_refinement.py"
+    "gmri2fem seg mask-intracranially"
     " --csf_mask {input.csf}"
     " --brain_mask {input.brain}"
-
 
 rule csfmask:
   input:
@@ -35,7 +34,7 @@ rule csfmask:
   output:
     "mri_processed_data/{subject}/segmentations/{subject}_seg-csf_binary.nii.gz",
   shell:
-    "python scripts/mask_csf.py {input} {output}"
+    "gmri2fem mri mask-csf --input {input} --output {output}"
 
 
 rule orbital_refroi:
@@ -49,13 +48,13 @@ rule orbital_refroi:
     "mri_processed_data/{subject}/segmentations/{subject}_seg-refroi-left-orbital_binary.nii.gz",
     "mri_processed_data/{subject}/segmentations/{subject}_seg-refroi-right-orbital_binary.nii.gz",
   shell:
-    "python gmri2fem/mriprocessing/orbital_refroi.py"
-      " --T1w_dir $(dirname '{input.T1w[0]}')"
-      " --segmentation {input.segmentation}"
-      " --output {output[0]}"
-      " --side 'left' && "
-    "python gmri2fem/mriprocessing/orbital_refroi.py"
-      " --T1w_dir $(dirname '{input.T1w[0]}')"
-      " --segmentation {input.segmentation}"
-      " --output {output[1]}"
-      " --side 'right'"
+    "gmri2fem seg orbital-refroi"
+    " --T1w_dir $(dirname '{input.T1w[0]}')"
+    " --segmentation {input.segmentation}"
+    " --output {output[0]}"
+    " --side 'left' && "
+    "gmri2fem seg orbital-refroi"
+    " --T1w_dir $(dirname '{input.T1w[0]}')"
+    " --segmentation {input.segmentation}"
+    " --output {output[1]}"
+    " --side 'right'"

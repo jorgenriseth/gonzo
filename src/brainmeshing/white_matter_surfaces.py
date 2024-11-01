@@ -5,7 +5,7 @@ from typing import Optional
 import click
 import numpy as np
 import pyvista as pv
-from gonzo.simple_mri import load_mri
+from simple_mri import load_mri
 
 from brainmeshing.surfaces import (
     grow_white_connective_tissue,
@@ -58,12 +58,24 @@ def main(
     lh_white_refined = pv.read(tmppath / "lh_white_refined.stl")
     connective = grow_white_connective_tissue(seg_mri)
     white_svm = surface_union(lh_white_refined, connective, rh_white_refined)
-    white_svm.difference(pyvista2svmtk(ventricle_surf))
+    # white_svm.difference(pyvista2svmtk(ventricle_surf))
     white = svmtk2pyvista(white_svm)
     if postsmooth_n > 0:
         white.smooth_taubin(
             postsmooth_n, postsmooth_pass_band, normalize_coordinates=True, inplace=True
         )
+    white.compute_normals(
+        cell_normals=True,
+        point_normals=True,
+        split_vertices=False,
+        flip_normals=False,
+        consistent_normals=True,
+        auto_orient_normals=True,
+        non_manifold_traversal=True,
+        feature_angle=30.0,
+        inplace=True,
+        progress_bar=False,
+    )
     pv.save_meshio(output, white)
 
 

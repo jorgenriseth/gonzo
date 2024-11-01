@@ -1,20 +1,14 @@
 import itertools
 from pathlib import Path
 
+import click
 import numpy as np
 import scipy
 import skimage
 import tqdm
 
-from gonzo.utils import apply_affine, largest_island
-from gonzo.simple_mri import (
-    load_mri,
-    SimpleMRI,
-    save_mri,
-    assert_same_space,
-    change_of_coordinates_map,
-    data_reorientation,
-)
+from gonzo.utils import apply_affine
+from simple_mri import load_mri, SimpleMRI, save_mri, assert_same_space
 
 MASK_DTYPE = np.uint8
 SEG_DTYPE = np.int16
@@ -114,26 +108,33 @@ def segmentation_smoothing(
     return {"labels": new_labels, "scores": high_scores}
 
 
-if __name__ == "__main__":
-    import argparse
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--fs_seg", type=Path, required=True)
-    parser.add_argument("--reference", type=Path, required=True)
-    parser.add_argument("--csfmask", type=Path, required=True)
-    parser.add_argument("--output_seg", type=Path, required=True)
-    parser.add_argument("--output_csfseg", type=Path, required=True)
-    parser.add_argument("--label_smoothing", type=float, default=0)
-    args = parser.parse_args()
-
-    upsampled_seg = seg_upsampling(args.reference, args.fs_seg)
-    if args.label_smoothing > 0:
+@click.command()
+@click.option("--fs_seg", type=Path, required=True)
+@click.option("--reference", type=Path, required=True)
+@click.option("--csfmask", type=Path, required=True)
+@click.option("--output_seg", type=Path, required=True)
+@click.option("--output_csfseg", type=Path, required=True)
+@click.option("--label_smoothing", type=float, default=0)
+def refine(
+    fs_seg: Path,
+    reference: Path,
+    csfmask: Path,
+    output_seg: Path,
+    output_csfseg: Path,
+    label_smoothing: float = 0,
+):
+    upsampled_seg = seg_upsampling(reference, fs_seg)
+    if label_smoothing > 0:
         upsampled_seg.data = segmentation_smoothing(
-            upsampled_seg.data, sigma=args.label_smoothing
+            upsampled_seg.data, sigma=label_smoothing
         )["labels"]
-    csf_mask = load_mri(args.csfmask, dtype=bool)
+    csf_mask = load_mri(csfmask, dtype=bool)
     csf_seg = csf_segmentation(upsampled_seg, csf_mask)
-    save_mri(csf_seg, args.output_csfseg, dtype=SEG_DTYPE)
+    save_mri(csf_seg, output_csfseg, dtype=SEG_DTYPE)
 
     refined_seg = segmentation_refinement(upsampled_seg, csf_seg)
-    save_mri(refined_seg, args.output_seg, dtype=SEG_DTYPE)
+    save_mri(refined_seg, output_seg, dtype=SEG_DTYPE)
+
+
+if __name__ == "__main__":
+    refine()

@@ -5,7 +5,7 @@ import dolfin as df
 import numpy as np
 import tqdm
 from gonzo.concentrations_to_mesh import nearest_neighbour
-from gonzo.simple_mri import load_mri
+from simple_mri import load_mri
 from gonzo.utils import apply_affine
 from pantarei import read_domain
 

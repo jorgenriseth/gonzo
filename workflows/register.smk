@@ -14,19 +14,27 @@ rule register_all:
         f"mri_processed_data/{subject}/registered/{subject}_{session}_acq-mixed_{variant}_registered.nii.gz"
         for subject in SUBJECTS
         for session in SESSIONS[subject]
-        for variant in ["T1map", "T1map_postprocessed", "R1map", "R1map_postprocessed"]
+        for variant in ["T1map", "T1map_raw", "R1map", "R1map_raw", "T1map_scanner", "R1map_scanner"]
     ],
     DTI=[
         f"mri_processed_data/{subject}/registered/{subject}_ses-01_dDTI_{variant}_registered.nii.gz"
         for subject in SUBJECTS
         for variant in ["MD", "FA"]
     ]
-    #T2w for free.
 
+
+ruleorder: reference_image > reslice_T1w
+rule reference_image:
+  input:
+    "mri_dataset/{subject}/ses-01/anat/{subject}_ses-01_T1w.nii.gz"
+  output:
+    "mri_processed_data/{subject}/registered/{subject}_ses-01_T1w_registered.nii.gz"
+  shell:
+    "cp {input} {output}"
 
 
 rule register:
-  threads: 12
+  threads: 10  # Use extra threads to avoid memory overload from parallell jobs
   params:
     metric="NCC 5x5x5"
   shell:
@@ -38,6 +46,7 @@ rule register:
     " -m {params.metric}"
     " -threads {threads}"
 
+
 rule reslice:
   threads: 4
   shell:
@@ -47,15 +56,6 @@ rule reslice:
     " -r {input.transform}"
     " -threads {threads}"
 
-
-ruleorder: reference_image > reslice_T1w
-rule reference_image:
-  input:
-    "mri_dataset/{subject}/ses-01/anat/{subject}_ses-01_T1w.nii.gz"
-  output:
-    "mri_processed_data/{subject}/registered/{subject}_ses-01_T1w_registered.nii.gz"
-  shell:
-    "cp {input} {output}"
 
 # T1w
 use rule register as register_T1w with:
@@ -99,7 +99,7 @@ use rule reslice as reslice_T2w with:
 use rule register as register_T1map_LL with:
   input:
     fixed="mri_processed_data/{subject}/registered/{subject}_ses-01_T1w_registered.nii.gz",
-    moving="mri_dataset/derivatives/{subject}/{session}/{subject}_{session}_acq-looklocker_R1map_postprocessed.nii.gz"
+    moving="mri_dataset/derivatives/{subject}/{session}/{subject}_{session}_acq-looklocker_R1map.nii.gz"
   output:
     transform="mri_processed_data/{subject}/transforms/{subject}_{session}_acq-looklocker.mat"
 
@@ -107,11 +107,10 @@ use rule register as register_T1map_LL with:
 use rule reslice as reslice_T1map_LL with:
   input:
     fixed="mri_processed_data/{subject}/registered/{subject}_ses-01_T1w_registered.nii.gz",
-    moving="mri_dataset/derivatives/{subject}/{session}/{subject}_{session}_acq-looklocker_T1map_postprocessed.nii.gz",
+    moving="mri_dataset/derivatives/{subject}/{session}/{subject}_{session}_acq-looklocker_{T1_variant}.nii.gz",
     transform="mri_processed_data/{subject}/transforms/{subject}_{session}_acq-looklocker.mat",
   output:
-    "mri_processed_data/{subject}/registered/{subject}_{session}_acq-looklocker_T1map_registered.nii.gz",
-
+    "mri_processed_data/{subject}/registered/{subject}_{session}_acq-looklocker_{T1_variant}_registered.nii.gz",
 
 # Mixed
 use rule register as register_mixed with:
@@ -130,6 +129,13 @@ use rule reslice as reslice_mixed with:
   output:
     "mri_processed_data/{subject}/registered/{subject}_{session}_acq-mixed_{T1_variant}_registered.nii.gz",
 
+use rule reslice as reslice_mixed_scanner with:
+  input: 
+    fixed="mri_processed_data/{subject}/registered/{subject}_ses-01_T1w_registered.nii.gz",
+    moving="mri_dataset/{subject}/{session}/mixed/{subject}_{session}_acq-mixed_T1map_scanner.nii.gz",
+    transform="mri_processed_data/{subject}/transforms/{subject}_{session}_acq-mixed.mat"
+  output:
+    "mri_processed_data/{subject}/registered/{subject}_{session}_acq-mixed_T1map_scanner_registered.nii.gz",
 
 # DTI
 use rule register as register_dti with:
