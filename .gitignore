@@ -1,6 +1,9 @@
 .snakemake 
 mri_dataset
 mri_processed_data
+figures
+notebooks
+
 
 *.xdmf
 *.h5

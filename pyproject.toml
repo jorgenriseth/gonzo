@@ -9,7 +9,7 @@ readme = "README.md"
 license = {file = "LICENSE"} 
 
 [project.scripts]
-gmri2fem = "gmri2fem._cli:gmri2fem"
+gmri2fem = "_cli:gmri2fem"
 
 [tool.setuptools]
 package-dir = {"" = "src"}
