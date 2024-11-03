@@ -6,10 +6,9 @@ rule concentration_estimate:
   output:
     "mri_processed_data/{subject}/concentrations/{subject}_{session}_concentration.nii.gz"
   shell:
-    "python src/gonzo/estimate_concentration.py"
-      " --input {input.image}"
-      " --reference {input.reference}"
-      " --output {output}"
-      " --r1 0.0045"
-      " --mask {input.mask}"
-
+    "gmri2fem mri concentration"
+    " --input {input.image}"
+    " --reference {input.reference}"
+    " --output {output}"
+    " --r1 0.0045"
+    " --mask {input.mask}"

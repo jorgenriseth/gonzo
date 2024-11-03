@@ -166,9 +166,9 @@ rule reslice_4D:
     "mri_processed_data/{subject}/registered/{subject}_ses-01_dDTI_tensor_registered.nii.gz",
   threads: 4
   shell:
-    "bash scripts/4d_reslice.sh"
-    " {input.fixed}"
-    " {input.moving}"
-    " {input.transform}"
-    " {output}"
-    " {threads}"
+      "gmri2fem mri reslice4d"
+      " --inpath {input.moving}"
+      " --fixed {input.fixed}"
+      " --outpath {output}"
+      " --transform {input.transform}"
+      " --threads {threads}"

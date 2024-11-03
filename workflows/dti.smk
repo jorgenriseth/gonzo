@@ -11,21 +11,21 @@ rule merge_b0_with_prescan:
     "mri_dataset/{subject}/ses-01/dwi/{subject}_ses-01_acq-multiband_sense_dir-AP_b0.nii.gz",
     "mri_dataset/{subject}/ses-01/dwi/{subject}_ses-01_acq-multiband_sense_dir-PA_b0.nii.gz"
   output:
-    "mri_dataset/derivatives/{subject}/ses-01/dti/{subject}_ses-01_acq-multiband_sense_topup_b0.nii.gz"
+    temp("mri_dataset/derivatives/{subject}/ses-01/dti/{subject}_ses-01_acq-multiband_sense_topup_b0.nii.gz")
   shell:
     "fslmerge -t {output} {input}"
 
 rule generate_acquisition_params_file:
   input:
-    "mri_dataset/{subject}/ses-01/dwi/{subject}_ses-01_acq-multiband_sense_dir-AP_DTI.json",
+    "mri_dataset/{subject}/ses-01/dwi/{subject}_ses-01_acq-multiband_sense_dir-AP_DTI.nii.gz",
     "mri_dataset/{subject}/ses-01/dwi/{subject}_ses-01_acq-multiband_sense_dir-PA_b0.json"
   output:
-    "mri_dataset/derivatives/{subject}/ses-01/dti/topup_acq_params.txt"
+    temp("mri_dataset/derivatives/{subject}/ses-01/dti/topup_acq_params.txt")
   shell:
-    "for i in {{1..10}}; do "
-    " echo 0 -1 0 $(jq '.EstimatedTotalReadoutTime' {input[0]}) >> {output};"
-    "done && "
-    "echo 0 1 0 $(jq '.EstimatedTotalReadoutTime' {input[1]}) >> {output}"
+    "gmri2fem dti topup-params"
+    " --imain {input[0]}"
+    " --b0_topup {input[1]}"
+    " --output {output}"
 
 rule topup:
   input:
@@ -53,7 +53,6 @@ rule topup_corrected_mean:
     "mri_dataset/derivatives/{subject}/ses-01/dti/mean_topup_b0.nii.gz",
   shell:
     "fslmaths {input} -Tmean {output}"
-
 
 rule dti_mask:
   input:
@@ -90,11 +89,11 @@ rule eddy_correction:
 
 rule eddy_index_file:
   input:
-    "mri_dataset/{subject}/ses-01/dwi/{subject}_ses-01_acq-multiband_sense_dir-AP_DTI.nii.gz",
+    "mri_dataset/{subject}/ses-01/dwi/{subject}_ses-01_acq-multiband_sense_dir-AP_DTI.nii.gz"
   output:
     temp("mri_dataset/derivatives/{subject}/ses-01/dti/eddy_index.txt")
   shell:
-    "bash scripts/eddy_index.sh {input} {output}"
+    "gmri2fem dti eddy-index --input {input} --output {output}"
 
 rule eddy_corrected_b0:
   input:
@@ -139,8 +138,7 @@ rule clean_dti:
   output:
     "mri_processed_data/{subject}/dti/{subject}_ses-01_dDTI_cleaned.nii.gz"
   shell:
-    "python src/gonzo/clean_dti_data.py"
+    "gmri2fem dti clean"
     " --dti {input.tensor}"
     " --mask {input.mask}"
-    " --out {output}"
-
+    " --output {output}"

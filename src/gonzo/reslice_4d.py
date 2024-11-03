@@ -3,10 +3,7 @@ import tempfile
 from pathlib import Path
 from typing import Optional
 
-import numpy as np
-import matplotlib.pyplot as plt
-
-from simple_mri import SimpleMRI, load_mri, save_mri
+from dti.utils import mri_number_of_frames
 import click
 
 
@@ -22,7 +19,7 @@ def moving_pair(args):
 @click.option("--outpath", type=Path, required=True)
 @click.option("--transform", type=Path)
 @click.option("--threads", type=int, default=1)
-def reslice_4d(
+def reslice4d(
     inpath: Path,
     fixed: Path,
     outpath: Path,
@@ -31,7 +28,7 @@ def reslice_4d(
 ) -> Path:
     if transform is None:
         transform = Path("")
-    nframes = int(subprocess.check_output(f"mri_info --nframes {inpath}", shell=True))
+    nframes = mri_number_of_frames(inpath)
     with tempfile.TemporaryDirectory(prefix=outpath.stem) as tmpdir:
         tmppath = Path(tmpdir)
         for i in range(nframes):

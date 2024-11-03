@@ -34,7 +34,7 @@ rule csfmask:
   output:
     "mri_processed_data/{subject}/segmentations/{subject}_seg-csf_binary.nii.gz",
   shell:
-    "gmri2fem mri mask-csf --input {input} --output {output}"
+    "gmri2fem seg mask-csf --input {input} --output {output}"
 
 
 rule orbital_refroi:

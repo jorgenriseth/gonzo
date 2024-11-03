@@ -1,6 +1,6 @@
 from pathlib import Path
-from typing import Optional
 
+from typing import Optional
 import click
 import numpy as np
 
@@ -23,7 +23,7 @@ def concentration_from_R1(R1: np.ndarray, R1_0: np.ndarray, r1: float) -> np.nda
 @click.option("--output", type=Path, required=True)
 @click.option("--r1", type=float, required=True)
 @click.option("--mask", type=Path)
-def main(
+def concentration(
     input: Path,
     reference: Path,
     output: Path,
@@ -53,4 +53,4 @@ def main(
 
 
 if __name__ == "__main__":
-    main()
+    concentration()

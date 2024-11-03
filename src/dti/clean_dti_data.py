@@ -1,25 +1,25 @@
-import argparse
 from pathlib import Path
 
+import click
 import numpy as np
 import scipy
 
 from simple_mri import SimpleMRI, load_mri, save_mri
 
 
-def clean_dti_data(dti_file: Path, mask_file: Path, out_file: Path):
-    dti_mri = load_mri(dti_file, dtype=np.single)
+def clean_dti_data(dti: Path, mask: Path, output: Path):
+    dti_mri = load_mri(dti, dtype=np.single)
     dti_mri.data = extend_to_9_component_array(dti_mri.data)
     dti = dti_mri.data
 
-    mask_mri = load_mri(mask_file, dtype=bool)
+    mask_mri = load_mri(mask, dtype=bool)
     mask = mask_mri.data
 
     D = dti.reshape(*dti.shape[:3], 3, 3)
     valid = is_valid_tensor(D)
     i, j, k = np.where(mask * ~valid)
     I, J, K = np.where(mask * valid)
-    interpolated = np.zeros_like(dti)
+    interpolated = np.nan * np.zeros_like(dti)
     interpolated[mask] = dti[mask]
     interpolated[i, j, k] = (
         scipy.interpolate.griddata(
@@ -31,7 +31,7 @@ def clean_dti_data(dti_file: Path, mask_file: Path, out_file: Path):
             reduce_to_6_component_array(interpolated.reshape(*dti.shape[:3], 1, 9)),
             dti_mri.affine,
         ),
-        out_file,
+        output,
         dtype=np.single,
     )
 
@@ -85,10 +85,13 @@ def fractional_anisotropy(eigvals: np.ndarray) -> np.ndarray:
     return FA
 
 
+@click.command()
+@click.option("--dti", type=Path, required=True)
+@click.option("--mask", type=Path, required=True)
+@click.option("--output", type=Path, required=True)
+def clean(**kwargs):
+    clean_dti_data(**kwargs)
+
+
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--dti", type=str)
-    parser.add_argument("--mask", type=str)
-    parser.add_argument("--out", type=str)
-    Z = parser.parse_args()
-    clean_dti_data(Z.dti, Z.mask, Z.out)
+    clean()

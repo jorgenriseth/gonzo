@@ -127,7 +127,23 @@ def reslice_dti(
             save_mri(resliced_mri, outpath, dtype=np.single)
 
     resliced_tensor = construct_tensor_from_eigs(outdir, out_pattern)
-    save_mri(resliced_tensor, outdir / f"{out_pattern}_tensor.nii.gz", dtype=np.single)
+    save_mri(resliced_tensor, outdir / f"{out_pattern}_tensor.nii.gz", dtype=np.single)h
+
+
+@click.command("eddy-index")
+@click.option("--input", type=Path, required=True)
+@click.option("--output", type=Path, required=True)
+def create_eddy_index_file(input: Path, output: Path):
+    nframes = int(
+        subprocess.check_output(
+            f"mri_info --nframes {inpath} | grep -v INFO", shell=True
+        )
+    )
+    index = ["1"] * nframes
+    with open(output, "w") as f:
+        f.write(" ".join(index))
+    
+    
 
 
 if __name__ == "__main__":

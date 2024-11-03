@@ -60,7 +60,7 @@ def csf_segmentation(
     I, J, K = np.where(seg_upsampled_mri.data != 0)
     inds = np.array([I, J, K]).T
     interp = scipy.interpolate.NearestNDInterpolator(inds, seg_upsampled_mri[I, J, K])
-    i, j, k = np.where(csf_mask.data)
+    i, j, k = np.where(csf_mask_mri.data)
     csf_seg = np.zeros_like(seg_upsampled_mri.data)
     csf_seg[i, j, k] = interp(i, j, k)
     return SimpleMRI(csf_seg, csf_mask_mri.affine)
@@ -75,7 +75,7 @@ def segmentation_refinement(
         upsampled_segmentation.data, distance=3
     )
     csf_mask = csf_segmentation.data != 0
-    combined_segmentation[csf_mask] = -csf_seg[csf_mask]
+    combined_segmentation[csf_mask] = -csf_segmentation.data[csf_mask]
 
     radius = closing_radius
     combined_mask = csf_mask + (upsampled_segmentation.data != 0)
