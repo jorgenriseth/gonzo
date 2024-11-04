@@ -4,15 +4,21 @@ authors = [
     {name = "Jørgen Riseth", email = "jnriseth@gmail.com"},
 ]
 version = "0.1.0"
-requires-python = ">=3.11"
+requires-python = ">=3.9,<3.13"
 readme = "README.md"
 license = {file = "LICENSE"} 
-
-[project.scripts]
-gmri2fem = "_cli:gmri2fem"
+dependencies = [
+    "gmri2fem",
+    "jupyter>=1.1.1",
+    "matplotlib>=3.9.2",
+    "numpy>=2.0.2",
+]
 
 [tool.setuptools]
 package-dir = {"" = "src"}
 
 [tool.mypy]
 plugins = "numpy.typing.mypy_plugin"
+
+[tool.uv.sources]
+gmri2fem = { path = "../gmri2fem" }

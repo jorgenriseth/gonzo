@@ -1,0 +1,32 @@
+Bootstrap: localimage
+From: singularity/fs-greedy.sif
+
+%arguments
+  CONDA_ENV_NAME="gonzo"
+
+%files
+  environment.yml
+  pyproject.toml 
+  src
+  Miniforge3.sh
+
+%post
+  # Create environment
+  export CONDA_ENV_NAME={{ CONDA_ENV_NAME }}
+  echo $CONDA_ENV_NAME
+  /opt/conda/bin/mamba env create -n $CONDA_ENV_NAME -f environment.yml
+
+  # Activate conda and install current python project in the environment
+  . /opt/conda/etc/profile.d/conda.sh
+  . /opt/conda/etc/profile.d/mamba.sh
+  conda activate $CONDA_ENV_NAME
+  /opt/conda/envs/$CONDA_ENV_NAME/bin/pip install --root-user-action=ignore -e .
+
+%environment 
+  export PATH="/greedy-1.3.0-alpha-Linux-gcc64/bin:$PATH"
+  export FREESURFER_HOME="/usr/local/freesurfer/7.4.1"
+  export FS_LICENSE=/license.txt
+  source $FREESURFER_HOME/SetUpFreeSurfer.sh
+  export PATH="/usr/local/freesurfer/7.4.1/bin:$PATH"
+  export CONDA_ENV_NAME={{ CONDA_ENV_NAME }}
+  export DIJITSO_CACHE_DIR="$HOME/.dijitso_cache"
