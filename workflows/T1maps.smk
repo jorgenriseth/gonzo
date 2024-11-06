@@ -101,6 +101,8 @@ rule hybrid_T1maps:
       " --mixed {input.mixed}"
       " --csfmask {input.csfmask}"
       " --output {output}"
+      " --threshold 1500"
+      " --erode 1"
 
 
 ruleorder: T1_to_R1 > reslice_T1map_LL > reslice_mixed
