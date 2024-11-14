@@ -20,13 +20,14 @@ rule segment_refinements:
 rule intracranial_mask:
   input:
     csf="mri_processed_data/{subject}/segmentations/{subject}_seg-csf-aseg.nii.gz",
-    brain="mri_processed_data/{subject}/segmentations/{subject}_seg-aseg_refined.nii.gz",
+    brain="mri_processed_data/{subject}/segmentations/{subject}_seg-wmparc_refined.nii.gz",
   output:
     "mri_processed_data/{subject}/segmentations/{subject}_seg-intracranial_binary.nii.gz",
   shell:
-    "gmri2fem seg mask-intracranially"
-    " --csf_mask {input.csf}"
-    " --brain_mask {input.brain}"
+    "gmri2fem seg mask-intracranial"
+    " --csfmask {input.csf}"
+    " --brain_seg {input.brain}"
+    " --output {output}"
 
 rule csfmask:
   input:

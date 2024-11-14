@@ -85,5 +85,5 @@ rule mesh_segmentation:
   output:
     "mri_processed_data/{subject}/modeling/resolution{res}/mesh_aparc.hdf"
   shell:
-    "gmri2fem brainmeshing subdomains"
+    "gmri2fem i2m subdomains"
     " {input} {output}"

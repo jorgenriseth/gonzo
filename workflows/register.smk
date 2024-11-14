@@ -49,9 +49,12 @@ rule register:
 
 rule reslice:
   threads: 4
+  params:
+    interp_mode="LINEAR"
   shell:
     "greedy -d 3"
     " -rf {input.fixed}"
+    " -ri {params.interp_mode}"
     " -rm {input.moving} {output}"
     " -r {input.transform}"
     " -threads {threads}"
@@ -126,6 +129,8 @@ use rule reslice as reslice_mixed with:
     fixed="mri_processed_data/{subject}/registered/{subject}_ses-01_T1w_registered.nii.gz",
     moving="mri_dataset/derivatives/{subject}/{session}/{subject}_{session}_acq-mixed_{T1_variant}.nii.gz",
     transform="mri_processed_data/{subject}/transforms/{subject}_{session}_acq-mixed.mat"
+  params:
+    interp_mode="NN"
   output:
     "mri_processed_data/{subject}/registered/{subject}_{session}_acq-mixed_{T1_variant}_registered.nii.gz",
 
@@ -134,6 +139,8 @@ use rule reslice as reslice_mixed_scanner with:
     fixed="mri_processed_data/{subject}/registered/{subject}_ses-01_T1w_registered.nii.gz",
     moving="mri_dataset/{subject}/{session}/mixed/{subject}_{session}_acq-mixed_T1map_scanner.nii.gz",
     transform="mri_processed_data/{subject}/transforms/{subject}_{session}_acq-mixed.mat"
+  params:
+    interp_mode="NN"
   output:
     "mri_processed_data/{subject}/registered/{subject}_{session}_acq-mixed_T1map_scanner_registered.nii.gz",
 
@@ -141,34 +148,27 @@ use rule reslice as reslice_mixed_scanner with:
 use rule register as register_dti with:
   input:
     fixed="mri_processed_data/{subject}/registered/{subject}_ses-01_T2w_registered.nii.gz",
-    moving="mri_dataset/derivatives/{subject}/ses-01/dti/dtifit_MD.nii.gz"
+    moving="mri_dataset/derivatives/{subject}/ses-01/dwi/{subject}_ses-01_dDTI_MD.nii.gz"
   params:
     metric="NMI"
   output:
-    "mri_processed_data/{subject}/transforms/{subject}_ses-01_DTI.mat"
+    "mri_processed_data/{subject}/transforms/{subject}_ses-01_dDTI.mat"
 
-ruleorder: reslice_4D > reslice_dti
-use rule reslice as reslice_dti with:
-  input: 
-    fixed="mri_processed_data/{subject}/registered/{subject}_ses-01_T1w_registered.nii.gz",
-    moving="mri_dataset/derivatives/{subject}/ses-01/dti/dtifit_{dti_value}.nii.gz",
-    transform="mri_processed_data/{subject}/transforms/{subject}_ses-01_DTI.mat"
-  output:
-    "mri_processed_data/{subject}/registered/{subject}_ses-01_dDTI_{dti_value}_registered.nii.gz",
-
-
-rule reslice_4D:
+rule reslice_dti:
   input:
     fixed="mri_processed_data/{subject}/registered/{subject}_ses-01_T1w_registered.nii.gz",
-    moving="mri_dataset/derivatives/{subject}/ses-01/dti/dtifit_tensor.nii.gz",
-    transform="mri_processed_data/{subject}/transforms/{subject}_ses-01_DTI.mat"
+    moving="mri_dataset/derivatives/{subject}/ses-01/dwi/{subject}_ses-01_dDTI_MD.nii.gz",
+    transform="mri_processed_data/{subject}/transforms/{subject}_ses-01_dDTI.mat"
   output:
     "mri_processed_data/{subject}/registered/{subject}_ses-01_dDTI_tensor_registered.nii.gz",
   threads: 4
   shell:
-      "gmri2fem mri reslice4d"
-      " --inpath {input.moving}"
+      "gmri2fem dti reslice-dti"
       " --fixed {input.fixed}"
-      " --outpath {output}"
+      " --dtidir $(dirname {input.moving})"
+      " --prefix_pattern $(basename {input.transform} | sed s/.mat//)"
+      " --outdir $(dirname {output})"
       " --transform {input.transform}"
       " --threads {threads}"
+      " --suffix _registered"
+      " --greedyargs '-ri NN'"

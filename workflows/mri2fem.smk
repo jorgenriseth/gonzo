@@ -7,7 +7,7 @@ rule collect:
   output:
     "mri_processed_data/{subject}/modeling/resolution{res}/data.hdf"
   shell:
-    "python src/i2m/_cli.py"
+    "gmri2fem i2m collect"
       " --domain {input.mesh}"
       " --dti_data {input.dti}"
       " --concentration_data {input.concentration}"
@@ -33,7 +33,7 @@ rule mri2fenics:
     femfamily="CG",
     femdegree=1,
   shell:
-    "python src/gonzo/concentrations_to_mesh.py"
+    "gmri2fem i2m concentrations2mesh"
     " {input.concentrations}"
     " --meshpath {input.mesh}"
     " --csfmask_path {input.csfmask}"
@@ -48,13 +48,31 @@ rule dti2fenics:
   input:
     meshfile="mri_processed_data/{subject}/modeling/resolution{res}/mesh.hdf",
     dti="mri_processed_data/{subject}/dti/{subject}_ses-01_dDTI_cleaned.nii.gz",
+    md = "mri_processed_data/{subject}/dti/dtifit_MD.nii.gz",
+    fa = "mri_processed_data/{subject}/dti/dtifit_FA.nii.gz",
+    mask= "mri_processed_data/{subject}/segmentations/{subject}_seg-aseg_refined.nii.gz",
   output:
     hdf="mri_processed_data/{subject}/modeling/resolution{res}/dti.hdf",
   shell:
-    "python src/gonzo/dti_data_to_mesh.py"
-      " --dti {input.dti}"
-      " --mesh {input.meshfile}"
-      " --out {output.hdf}"
+    "gmri2fem i2m dti2mesh"
+    " --mesh {input.meshfile}"
+    " --dti {input.dti}"
+    " --md {input.md}"
+    " --fa {input.fa}"
+    " --mask {input.mask}"
+    " --output {output.hdf}"
+
+rule hdf2vtk:
+    input:
+        "mri_processed_data/{subject}/modeling/resolution{res}/data.hdf"
+    output:
+        "mri_processed_data/{subject}/modeling/resolution{res}/data.vtk"
+    shell:
+        "gmri2fem i2m hdf2vtk"
+        " --input {input}"
+        " --output {output}"
+
+
 
 
 rule extract_concentration_times_LL:
@@ -72,7 +90,7 @@ rule extract_concentration_times_LL:
 
 rule fenics2mri_workflow:
   input:
-    referenceimage="mri_processed_data/freesurfer/{subject}/mri/t1.mgz",
+    referenceimage="mri_processed_data/{subject}/registered/sub-01_ses-01_T1w_registered.nii.gz",
     simulationfile="mri_processed_data/{subject}/modeling/resolution{res}/{funcname}.hdf",
     timestampfile="{subject}/timestamps_ll.txt",
   output:
