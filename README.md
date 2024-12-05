@@ -27,7 +27,7 @@ conda activate gmri2fem
 ```
 
 ### Download the data
-The script `scripts/zenodo_download.py` uses the Zenodo wrapper to list and/or download all or specific files.
+The script `scripts/zenodo_download.py` uses the Zenodo REST API to list and/or download all or specific files.
 It requires `pydantic_settings` which is installable through pip. 
 To download the data, create an `.env`-file in the root directory of this repository with the following content:
 ```bash
