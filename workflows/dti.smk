@@ -145,7 +145,7 @@ rule clean_dti:
     tensor="mri_processed_data/{subject}/registered/{subject}_ses-01_dDTI_tensor_registered.nii.gz",
     mask="mri_processed_data/{subject}/segmentations/{subject}_seg-aparc+aseg_refined.nii.gz"
   output:
-    "mri_processed_data/{subject}/dwi/{subject}_ses-01_acq-multiband_sense_{subject}_ses-01_dDTI_cleaned.nii.gz"
+    "mri_processed_data/{subject}/dwi/{subject}_ses-01_dDTI_cleaned.nii.gz"
   shell:
     "gmri2fem dti clean"
     " --dti {input.tensor}"

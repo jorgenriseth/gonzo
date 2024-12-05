@@ -1,61 +1,77 @@
-## Gonzo - MRI Dataset
+# Gonzo: Human brain MRI data of CSF-tracer evolution over 72h for data-integrated simulations
+This repository documents the processing pipeline for the Gonzo dataset containing dynamic contrast-enhanced MRI-images following intrathecal injection of gadobutrol in a healthy human being. 
+The data record is available at (Zenodo-link). 
 
-This repository contains code for processing glymphatic MRI-images, i.e. contrast-enhanced brain images, with special focus on concentration-estimation and conversion into dolfin for mathematical modelling of brain tracer transport using the finite element method. 
+This document describes how to setup and run each step of the processing pipeline. If you are only interested in downloading the data, you can skip ahead to [download the data](#download-the-data).
+## Setup
+### Dependencies
+- `FreeSurfer`
+- `snakemake`
+- `conda`/`mamba`
+- `greedy` (https://github.com/pyushkevich/greedy)
+- `gmri2fem`: (https://github.com/jorgenriseth/gMRI2FEM)
 
-While this repository may be installed as a python-package and used freely as such, it also contains a `snakemake` processing pipeline built around estimating concentrations from T1-weighted images or T1-maps, and mapping them to `dolfin`-functions. This, of course, relies on having the available data and organizing it according to the data section below.
+Either consult their web-pages or see the `%post`-section in `singularity/fs-greedy.def` for instructions on how to install FreeSurfer, greedy and conda.
 
 ## Setup
+``` bash
+conda env create -n gmri2fem -f environment.yml
+conda activate gmri2fem
+```
+
 ### Python-environment:
-Assuming `conda`/`mamba` is installed, create an environment by running
+Assuming `conda` is installed, create and activate the environment by running
 ```bash
 conda env create -n gmri2fem -f environment.yml
 conda activate gmri2fem
 ```
-and install the current repository as a package (optional `-e` for editable) using 
+
+### Download the data
+The script `scripts/zenodo_download.py` uses the Zenodo wrapper to list and/or download all or specific files.
+It requires `pydantic_settings` which is installable through pip. 
+To download the data, create an `.env`-file in the root directory of this repository with the following content:
 ```bash
-pip install [-e] .
+ACCESS_TOKEN=[Your Zenodo API Token]
+API_URL="https://zenodo.org/api/deposit/depositions/14266867"
 ```
+Note that the Zenodo API token wil not be needed once the record is made public, and can be left empty.
+Once the `.env`-file have been created, you can list or download the data files by: 
+```bash
+# List all available files in the repo
+python scripts/zenodo_download.py --list 
 
-### General dependencies
-The repository relies on the following software:
-- `FreeSurfer`
-- `greedy`
-- `dcm2niix`
-- `conda`/`mamba`
+# Download  all files into the directory 'outputdir'
+python scripts/zenodo_download.py --all  --output outputdir
 
-Either consult their web-pages or see the `%post`-section in `singularity/fs-greedy.def` for instructions on how to install these dependencies (or build and use the singularity-container `singularity/gmri2fem.def` to install dependencies and python-environment).
+# Download only the file "README.md" into the current directoryp
+python scripts/zenodo_download.py --filename README.md --output .
+```
 
 ### `snakeconfig`
-Several parts of the pipeline can be configured to run for only for specific subjects or with specific settings. These values can be set in  the `snakeconfig.yaml` in the root folder.
-- TODO: remove resource-specifications such as num-threads to `snakeprofiles`
-- TODO: add a default for num-sessions which allows for subject-specific number of sessions
+By default the pipeline only generates the mesh for a single resolution, defined by the `SVMTK` resolution argument. If you want higher or lower resolutions, these can be specified in the `snakeconfig.yaml`-file in the root folder.
 ```bash
-subjects: [] # list of subject-names to include when running general workflows
-resolution: [32]  # list of desired SVMTK-resolutions to generate meshes and run simulations for
-sim_threads: 8  # Number of cores to use for simulatiohns
-recon_threads: 1  # number of cores to use for regon-all
-num_sessions: 5   # Expected number of sessions
+resolution: [32,]  # list of desired SVMTK-resolutions to generate the meshes for.
 ```
 
+### Source
+- `Snakefile`: Top-level snakefile defining each step of the processing pipeline. 
+- `workflows/`: Contains files to be imported into the top-level `Snakefile` and specifies workflows in a modular way.
+
 ### Data
-The `snakemake`-pipeline requires a dataset-structure loosely based on the BIDS-data structure in a directory called `data` (could also be a symlink to an already existing dataset, although this requires some care if running with `singularity`-containers). The dataset is split into two main directories:
-- `mri_dataset`
-- `mri_processed_data`
+The dataset is split into two main directories,
+- #### `mri_dataset`
+    The `mri_dataset` follows a BIDS-like structure and should contain the following directories
+    - `sub-01`: MRI-data converted from DICOM-format to Nifti. For further details on the conversion see `notebooks/Gonzo-DICOM-extraction.ipynb`.
+        - Organized according to: 
+            `sub-01/ses-[XX]/[anat|dti|mixed]/sub-01_ses-[XX]_ADDITIONALINFO.nii.gz`.
+        - All MRI-images comes with a "sidecar"-file in `json`-format providing additional information in the same directory as the image.
+    - `derivatives/sub-01`: Contains MRI-data directly derived from the Niftii-files in the subject folders, such as T1-maps derived from LookLocker using NordicICE, or from Mixed-sequences using the provided code. Also contains a table with sequence acquisition times in seconds, relative to injection_time.
 
-### `data/mri_dataset`
-The `mri_dataset`-folder should contain the following:
-- `sub-[subjectid]`: MRI-data converted from DICOM-format to Niftii, using either `dcm2niix` or the script `code/extract_mixed_sequence.py`.  Organized according to `sub-[subjectid]/ses-[XX]/[anat|dti]/sub-[subjectid]_ses-[XX]_ADDITIONALINFO.nii.gz`. All MRI-images comes with a "sidecar"-file in `json`-format providing additional information.
-- `derivatives/sub-[subjectid]`: Contains MRI-data directly derived from the Niftii-files in the subject folders, such as T1-maps derived from LookLocker using NordicICE, or from Mixed-sequences using the provided code. Also contains a table with sequence acquisition times in seconds, relative to injection_time.
-- `code`: Contains scripts and code that were used to extract images or information from the DICOM sourcedata. We strive to keep any code interacting with DICOM-files in this directory, rather than in the python-package, since the source-data is often organized without following any specific convention.
-- `Snakefile`: Snakefile describing workflows with scripts and code in the `code`-folder
-- (Optional) `sourcedata`: DICOM-files. Organized by session according to `sourcedata/sub-[subjectid]/[raw_datelabel]/[raw_sessionlabel]/`. Will potentially be excluded from public dataset.
-
-
-### `data/mri_processed_data`
-The `mri_processed_data`-folder contains information and data which are not organized according to the `BIDS`-format, either due to incompatibility of software, or if another organization greatly simplifies processing.
-It will typically contain the following directories:
-- `freesurfer/sub-[subjectid]`: Output of Freesurfer's `recon-all` for given subject.
-- `sub-[subjectid]`: Folder for processed data for the given subject, such as registered images, concentration-estimates meshes and statistics.
+- ### `mri_processed_data`
+    The `mri_processed_data`-folder contains information and data which are not organized according to the `BIDS`-format, either due to incompatibility of software, or if another organization greatly simplifies processing.
+    It will typically contain the following directories:
+    - `freesurfer/sub-01`: Output of Freesurfer's `recon-all` for given subject.
+    - `sub-01`: Folder for processed data for the given subject, such as registered images, concentration-estimates meshes and statistics.
 
 
 Note that the `snakemake`-files in `workflows_additional` specifies workflows by desired outputs, necessary inputs, and shell command to be executed in a relatively easy to read format. Consulting these files might answer several questions regarding the expected structure.
