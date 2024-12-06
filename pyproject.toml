@@ -4,21 +4,35 @@ authors = [
     {name = "Jørgen Riseth", email = "jnriseth@gmail.com"},
 ]
 version = "0.1.0"
-requires-python = ">=3.9,<3.13"
+requires-python = ">=3.9,<3.12"
 readme = "README.md"
 license = {file = "LICENSE"} 
-dependencies = [
-    "gmri2fem",
-    "jupyter>=1.1.1",
-    "matplotlib>=3.9.2",
-    "numpy>=2.0.2",
+dependencies = [ "gmri2fem @ git+https://github.com/jorgenriseth/gMRI2FEM.git", "pantarei @ git+https://github.com/jorgenriseth/pantarei.git", "numpy", "setuptools", "matplotlib>=3.9.3,<4", "jupyter>=1.1.1,<2", "pydantic-settings>=2.6.1,<3", "simple-mri>=0.1.5,<0.2", "h5py>=3.12.1,<4",
 ]
 
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
 [tool.setuptools]
-package-dir = {"" = "src"}
+packages = []
 
 [tool.mypy]
-plugins = "numpy.typing.mypy_plugin"
+#plugins = "numpy.typing.mypy_plugin"
 
-[tool.uv.sources]
-gmri2fem = { path = "../gmri2fem" }
+[tool.pixi.project]
+channels = ["conda-forge", "bioconda", "jorgenriseth"]
+platforms = ["linux-64"]
+
+[tool.pixi.pypi-dependencies]
+gonzo = { path = ".", editable = true }
+
+[tool.pixi.tasks]
+
+[tool.pixi.dependencies]
+snakemake = ">=8.25.5,<9"
+python = ">=3.9,<3.12" # Limited above by legacy ufl and pkg_resources.
+numpy = ">=1.26.4,<2"
+svmtk = ">=1.3.0,<2"
+fenics = ">=2019"
+h5py = ">=3.12.1,<4"

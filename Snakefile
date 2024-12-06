@@ -21,7 +21,7 @@ wildcard_constraints:
 if "subjects" in config:
 	SUBJECTS=config["subjects"]
 else:
-  SUBJECTS = [p.stem for p in Path("mri_dataset/sourcedata").glob("sub-*")]
+  SUBJECTS = [p.stem for p in Path("mri_dataset/").glob("sub-*")]
   config["subjects"] = SUBJECTS
 
 if "ignore_subjects" in config:
@@ -30,11 +30,12 @@ if "ignore_subjects" in config:
   config["subjects"] = SUBJECTS
 
 SESSIONS = {
-  subject: sorted([p.stem for p in Path(f"mri_dataset/sourcedata/{subject}").glob("ses-*")])
+  subject: sorted([p.stem for p in Path(f"mri_dataset/{subject}").glob("ses-*")])
   for subject in SUBJECTS
 }
 config["sessions"] = SESSIONS
 config["FS_DIR"] = "mri_processed_data/freesurfer/{subject}"
+
 
 include: "workflows/T1maps.smk"
 include: "workflows/T1w.smk"
@@ -45,4 +46,4 @@ include: "workflows/dti.smk"
 include: "workflows/statistics.smk"
 include: "workflows/mesh-generation.smk"
 include: "workflows/mri2fem.smk"
-#include: "workflows/recon-all.smk"
+include: "workflows/recon-all.smk"

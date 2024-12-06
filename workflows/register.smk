@@ -161,13 +161,15 @@ rule reslice_dti:
     transform="mri_processed_data/{subject}/transforms/{subject}_ses-01_dDTI.mat"
   output:
     "mri_processed_data/{subject}/registered/{subject}_ses-01_dDTI_tensor_registered.nii.gz",
+    "mri_processed_data/{subject}/registered/{subject}_ses-01_dDTI_MD_registered.nii.gz",
+    "mri_processed_data/{subject}/registered/{subject}_ses-01_dDTI_FA_registered.nii.gz",
   threads: 4
   shell:
       "gmri2fem dti reslice-dti"
       " --fixed {input.fixed}"
       " --dtidir $(dirname {input.moving})"
       " --prefix_pattern $(basename {input.transform} | sed s/.mat//)"
-      " --outdir $(dirname {output})"
+      " --outdir $(dirname {output[0]})"
       " --transform {input.transform}"
       " --threads {threads}"
       " --suffix _registered"

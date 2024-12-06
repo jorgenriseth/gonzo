@@ -47,9 +47,9 @@ rule mri2fenics:
 rule dti2fenics:
   input:
     meshfile="mri_processed_data/{subject}/modeling/resolution{res}/mesh.hdf",
-    dti="mri_processed_data/{subject}/dti/{subject}_ses-01_dDTI_cleaned.nii.gz",
-    md = "mri_processed_data/{subject}/dti/dtifit_MD.nii.gz",
-    fa = "mri_processed_data/{subject}/dti/dtifit_FA.nii.gz",
+    dti="mri_processed_data/{subject}/dwi/{subject}_ses-01_dDTI_cleaned.nii.gz",
+    md = "mri_processed_data/{subject}/registered/{subject}_ses-01_dDTI_MD_registered.nii.gz",
+    fa = "mri_processed_data/{subject}/registered/{subject}_ses-01_dDTI_FA_registered.nii.gz",
     mask= "mri_processed_data/{subject}/segmentations/{subject}_seg-aseg_refined.nii.gz",
   output:
     hdf="mri_processed_data/{subject}/modeling/resolution{res}/dti.hdf",
@@ -90,7 +90,7 @@ rule extract_concentration_times_LL:
 
 rule fenics2mri_workflow:
   input:
-    referenceimage="mri_processed_data/{subject}/registered/sub-01_ses-01_T1w_registered.nii.gz",
+    referenceimage="mri_processed_data/{subject}/registered/{subject}_ses-01_T1w_registered.nii.gz",
     simulationfile="mri_processed_data/{subject}/modeling/resolution{res}/{funcname}.hdf",
     timestampfile="{subject}/timestamps_ll.txt",
   output:

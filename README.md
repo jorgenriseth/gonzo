@@ -6,6 +6,7 @@ This document describes how to setup and run each step of the processing pipelin
 ## Setup
 ### Dependencies
 - `FreeSurfer`
+- `FSL`
 - `snakemake`
 - `conda`/`mamba`
 - `greedy` (https://github.com/pyushkevich/greedy)
