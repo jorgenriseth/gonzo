@@ -4,14 +4,11 @@ from pathlib import Path
 shell.executable("bash")
 
 configfile: "snakeconfig.yaml"
-container: "singularity/Singularity"
+container: "singularity/gonzo.sif"
 
 if DeploymentMethod.APPTAINER in workflow.deployment_settings.deployment_method:
   shell.prefix(
-    "set -eo pipefail; "
-    + "source /opt/conda/etc/profile.d/conda.sh && "
-    + "conda activate $CONDA_ENV_NAME && "
-    #    + "ls -l && "
+    "set -eo pipefail; pixi run "
   )
 
 wildcard_constraints:
