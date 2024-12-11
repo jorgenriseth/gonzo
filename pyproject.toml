@@ -7,7 +7,20 @@ version = "0.1.0"
 requires-python = ">=3.9,<3.12"
 readme = "README.md"
 license = {file = "LICENSE"} 
-dependencies = [ "gmri2fem @ git+https://github.com/jorgenriseth/gMRI2FEM.git", "pantarei @ git+https://github.com/jorgenriseth/pantarei.git", "numpy", "setuptools", "matplotlib>=3.9.3,<4", "jupyter>=1.1.1,<2", "pydantic-settings>=2.6.1,<3", "simple-mri>=0.1.5,<0.2", "h5py>=3.12.1,<4",
+dependencies = [ 
+  "gmri2fem @ git+https://github.com/jorgenriseth/gMRI2FEM.git",
+  "pantarei @ git+https://github.com/jorgenriseth/pantarei.git",
+  "numpy",
+  "setuptools",
+  "matplotlib>=3",
+  "jupyter",
+  "pydantic-settings>=2",
+  "simple-mri",
+  "h5py>=3",
+  "click",
+  "nibabel",
+  "vtk",
+  "scipy"
 ]
 
 [build-system]

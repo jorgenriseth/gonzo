@@ -5,10 +5,9 @@ The data record is available at (Zenodo-link).
 This document describes how to setup and run each step of the processing pipeline. If you are only interested in downloading the data, you can skip ahead to [download the data](#download-the-data).
 ## Setup
 ### Dependencies
-- `pixi` Python package manager (https://pixi.sh/latest/)
+- `pixi` Python package manager: https://pixi.sh/latest/. ([Why pixi?](https://ericmjl.github.io/blog/2024/8/16/its-time-to-try-out-pixi/))
 - `FreeSurfer`
 - `FSL`
-- `snakemake`
 - `greedy` (https://github.com/pyushkevich/greedy)
 - `gmri2fem`: (https://github.com/jorgenriseth/gMRI2FEM)
 
@@ -20,6 +19,11 @@ Install pixi by:
 ```bash
 curl -fsSL https://pixi.sh/install.sh | bash
 ```
+To activate the python environment, run
+```bash
+pixi shell
+```
+from the project root. The first time you run this, `pixi` will create the environment and install all necessary packages.
 
 ### Download the data
 Information regarding the organization of the data may be found together with the data record at: https://zenodo.org/uploads/14266867.
@@ -44,11 +48,16 @@ python scripts/zenodo_download.py --filename README.md --output .
 ```
 
 ### Run `snakemake`
-
 ```bash
 pixi run snakemake data.vtk [--dry-run]  # Recommend dry-run first to see the list of jobs needed to generate the files. The remove them to run the jobs.
 ```
+NB: If you have already activated the environment using `pixi shell`, you can drop `pixi run` from this command.
 
+### Noise-estimation
+Several scripts for investigating the effect of noise on $T_1$-estimates for both the Look-Locker and the mixed IR/SE sequence are available in `scripts/mri_noise_analysis`. Change to that directory and run the scripts from command line. To see possible command line arguments, run e.g.
+```bash
+python plot_noise_combined.py --help
+```
 
 ### `snakeconfig`
 By default the pipeline only generates the mesh for a single resolution, defined by the `SVMTK` resolution argument. If you want higher or lower resolutions, these can be specified in the `snakeconfig.yaml`-file in the root folder.
