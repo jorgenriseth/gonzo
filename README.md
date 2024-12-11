@@ -5,26 +5,20 @@ The data record is available at (Zenodo-link).
 This document describes how to setup and run each step of the processing pipeline. If you are only interested in downloading the data, you can skip ahead to [download the data](#download-the-data).
 ## Setup
 ### Dependencies
+- `pixi` Python package manager (https://pixi.sh/latest/)
 - `FreeSurfer`
 - `FSL`
 - `snakemake`
-- `conda`/`mamba`
 - `greedy` (https://github.com/pyushkevich/greedy)
 - `gmri2fem`: (https://github.com/jorgenriseth/gMRI2FEM)
 
 Either consult their web-pages or see the `%post`-section in `singularity/fs-greedy.def` for instructions on how to install FreeSurfer, greedy and conda.
 
 ## Setup
-``` bash
-conda env create -n gmri2fem -f environment.yml
-conda activate gmri2fem
-```
-
-### Python-environment:
-Assuming `conda` is installed, create and activate the environment by running
+### Install `pixi`
+Install pixi by:
 ```bash
-conda env create -n gmri2fem -f environment.yml
-conda activate gmri2fem
+curl -fsSL https://pixi.sh/install.sh | bash
 ```
 
 ### Download the data
@@ -47,6 +41,13 @@ python scripts/zenodo_download.py --all  --output outputdir
 # Download only the file "README.md" into the current directoryp
 python scripts/zenodo_download.py --filename README.md --output .
 ```
+
+### Run `snakemake`
+Assuming that the raw MRI-images from the file `mri-dataset.zip` are downloaded and extracted, all necessary workflows to generate downstream files may be generated using `snakemake`, e.g.
+```bash
+pixi run snakemake data.vtk [--dry-run]  # Recommend dry-run first to see the list of jobs needed to generate the files. The remove them to run the jobs.
+```
+
 
 ### `snakeconfig`
 By default the pipeline only generates the mesh for a single resolution, defined by the `SVMTK` resolution argument. If you want higher or lower resolutions, these can be specified in the `snakeconfig.yaml`-file in the root folder.
