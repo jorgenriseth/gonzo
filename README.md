@@ -22,6 +22,7 @@ curl -fsSL https://pixi.sh/install.sh | bash
 ```
 
 ### Download the data
+Information regarding the organization of the data may be found together with the data record at: https://zenodo.org/uploads/14266867.
 The script `scripts/zenodo_download.py` uses the Zenodo REST API to list and/or download all or specific files.
 It requires `pydantic_settings` which is installable through pip. 
 To download the data, create an `.env`-file in the root directory of this repository with the following content:
@@ -43,7 +44,7 @@ python scripts/zenodo_download.py --filename README.md --output .
 ```
 
 ### Run `snakemake`
-Assuming that the raw MRI-images from the file `mri-dataset.zip` are downloaded and extracted, all necessary workflows to generate downstream files may be generated using `snakemake`, e.g.
+
 ```bash
 pixi run snakemake data.vtk [--dry-run]  # Recommend dry-run first to see the list of jobs needed to generate the files. The remove them to run the jobs.
 ```
@@ -58,24 +59,4 @@ resolution: [32,]  # list of desired SVMTK-resolutions to generate the meshes fo
 ### Source
 - `Snakefile`: Top-level snakefile defining each step of the processing pipeline. 
 - `workflows/`: Contains files to be imported into the top-level `Snakefile` and specifies workflows in a modular way.
-
-### Data
-The dataset is split into two main directories,
-- #### `mri_dataset`
-    The `mri_dataset` follows a BIDS-like structure and should contain the following directories
-    - `sub-01`: MRI-data converted from DICOM-format to Nifti. For further details on the conversion see `notebooks/Gonzo-DICOM-extraction.ipynb`.
-        - Organized according to: 
-            `sub-01/ses-[XX]/[anat|dti|mixed]/sub-01_ses-[XX]_ADDITIONALINFO.nii.gz`.
-        - All MRI-images comes with a "sidecar"-file in `json`-format providing additional information in the same directory as the image.
-    - `derivatives/sub-01`: Contains MRI-data directly derived from the Niftii-files in the subject folders, such as T1-maps derived from LookLocker using NordicICE, or from Mixed-sequences using the provided code. Also contains a table with sequence acquisition times in seconds, relative to injection_time.
-
-- ### `mri_processed_data`
-    The `mri_processed_data`-folder contains information and data which are not organized according to the `BIDS`-format, either due to incompatibility of software, or if another organization greatly simplifies processing.
-    It will typically contain the following directories:
-    - `freesurfer/sub-01`: Output of Freesurfer's `recon-all` for given subject.
-    - `sub-01`: Folder for processed data for the given subject, such as registered images, concentration-estimates meshes and statistics.
-
-
-Note that the `snakemake`-files in `workflows_additional` specifies workflows by desired outputs, necessary inputs, and shell command to be executed in a relatively easy to read format. Consulting these files might answer several questions regarding the expected structure.
-
 
