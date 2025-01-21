@@ -1,4 +1,4 @@
-.snakemake 
+.snakemake
 mri_dataset
 mri_processed_data
 figures
@@ -8,8 +8,8 @@ notebooks
 *.xdmf
 *.h5
 *.hdf
-
-
+*.png
+*.npy
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
