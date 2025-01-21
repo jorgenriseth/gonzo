@@ -50,7 +50,7 @@ rule register:
 rule reslice:
   threads: 4
   params:
-    interp_mode="LINEAR"
+    interp_mode="NN"
   shell:
     "greedy -d 3"
     " -rf {input.fixed}"
