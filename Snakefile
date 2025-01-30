@@ -4,11 +4,15 @@ from pathlib import Path
 shell.executable("bash")
 
 configfile: "snakeconfig.yaml"
-container: "singularity/gonzo.sif"
+container: "singularity/pixi.sif"
 
 if DeploymentMethod.APPTAINER in workflow.deployment_settings.deployment_method:
   shell.prefix(
-    "set -eo pipefail; pixi run "
+    "set -eo pipefail; "
+    "pixi run "
+    # + "source /opt/conda/etc/profile.d/conda.sh && "
+    # + "conda activate $CONDA_ENV_NAME && "
+    #    + "ls -l && "
   )
 
 wildcard_constraints:
@@ -43,4 +47,4 @@ include: "workflows/dti.smk"
 include: "workflows/statistics.smk"
 include: "workflows/mesh-generation.smk"
 include: "workflows/mri2fem.smk"
-include: "workflows/recon-all.smk"
+#include: "workflows/recon-all.smk"
