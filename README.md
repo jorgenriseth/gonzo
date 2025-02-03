@@ -12,7 +12,7 @@ This document describes how to setup and run each step of the processing pipelin
 - `greedy` (https://github.com/pyushkevich/greedy)
 - `gmri2fem`: (https://github.com/jorgenriseth/gMRI2FEM)
 
-Either consult their web-pages or see the `%post`-section in `singularity/fs-greedy.def` for instructions on how to install FreeSurfer, greedy and conda.
+Either consult their web-pages or see the `%post`-section in `singularity/gonzo.def` for instructions on how to install FreeSurfer, greedy and conda.
 
 ## Setup
 ``` bash
@@ -25,6 +25,16 @@ Assuming `conda` is installed, create and activate the environment by running
 ```bash
 conda env create -n gmri2fem -f environment.yml
 conda activate gmri2fem
+```
+
+### Singularity
+If desired, the pipeline can be run in a singularity-container. To build the container, run
+```bash
+singularity build singularity/gonzo.sif singularity/gonzo.def
+```
+Once built, the `snakemake` pipeline may be run by container can be run using 
+```bash
+pixi run snakemake {file-to-process} --use-singularity
 ```
 
 ### Download the data
@@ -76,5 +86,6 @@ The dataset is split into two main directories,
 
 
 Note that the `snakemake`-files in `workflows_additional` specifies workflows by desired outputs, necessary inputs, and shell command to be executed in a relatively easy to read format. Consulting these files might answer several questions regarding the expected structure.
+
 
 

@@ -56,14 +56,16 @@ rule fastsurfer:
             "mri_processed_data/fastsurfer/{{subject}}/surf/{surf}",
             surf=["lh.pial", "rh.pial", "lh.white", "rh.white"]
         ))
-    container: "docker://deepmi/fastsurfer:cuda-v2.3.3"
+    threads: 10
     shell:
       "/fastsurfer/run_fastsurfer.sh"
-      " --fs_license singularity/license.txt"
+      " --fs_license $(realpath singularity/license.txt)"
       " --t1 $(realpath {input.t1})"
       " --sid {wildcards.subject}"
       " --sd $(realpath $(dirname {output[0]})/../..)"
       " --parallel"
       " --3T"
+      " --threads {threads}"
+      " --no_hypothal"
       " --viewagg_device 'cpu'"
 

@@ -4,7 +4,7 @@ from pathlib import Path
 shell.executable("bash")
 
 configfile: "snakeconfig.yaml"
-container: "singularity/Singularity"
+container: "singularity/gonzo.sif"
 
 if DeploymentMethod.APPTAINER in workflow.deployment_settings.deployment_method:
   shell.prefix(
