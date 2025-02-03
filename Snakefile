@@ -8,8 +8,10 @@ container: "singularity/gonzo.sif"
 
 if DeploymentMethod.APPTAINER in workflow.deployment_settings.deployment_method:
   shell.prefix(
-    "set -eo pipefail; pixi run "
-  )
+    "set -eo pipefail; "
+    + "pixi run "
+    # + "ls -l && "
+)
 
 wildcard_constraints:
   session = r"ses-\d{2}",
@@ -32,6 +34,17 @@ SESSIONS = {
 }
 config["sessions"] = SESSIONS
 config["FS_DIR"] = "mri_processed_data/freesurfer/{subject}"
+
+rule all:
+  output: 
+    "build-archive/freesurfer.zip",
+    "build-archive/mesh-data.zip",
+    "build-archive/mri-dataset.zip",
+    "build-archive/mri-dataset-precontrast-only.zip",
+    "build-archive/mri-processed.zip",
+    "build-archive/surfaces.zip"
+  shell:
+    "bash ./scripts/archive.sh"
 
 
 include: "workflows/T1maps.smk"
