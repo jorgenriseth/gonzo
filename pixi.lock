@@ -269,7 +269,6 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/27/cd/c883e1a7c447479d6e13985565080e3fea88ab5a107c21684c813dba1875/flexcache-0.3-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/fe/5e/3be305568fe5f34448807976dc82fc151d76c3e0e03958f34770286278c1/flexparser-0.4-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/f2/e0/e58b10ef50830145ba94dbeb64b70773af61cfccea663d485c7fae2aab65/fonttools-4.55.8-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
-      - pypi: git+https://github.com/jorgenriseth/gmri2fem#6cfd3935b98b14d4d6df4959d1ff97f909968bf7
       - pypi: https://files.pythonhosted.org/packages/30/cb/44245b93105e93ca0223f4dfbfd199803b10770e79dee63f63cb755570e0/gmsh-4.13.1-py2.py3-none-manylinux_2_24_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/95/04/ff642e65ad6b90db43e668d70ffb6736436c7ce41fcc549f4e9472234127/h11-0.14.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/87/f5/72347bc88306acb359581ac4d52f23c0ef445b57157adedb9aee0cd689d2/httpcore-1.0.7-py3-none-any.whl
@@ -308,7 +307,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/f9/33/bd5b9137445ea4b680023eb0469b2bb969d61303dedb2aac6560ff3d14a1/notebook_shim-0.2.4-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/2c/ab/fc8290c6a4c722e5514d80f62b2dc4c4df1a68a41d1364e625c35990fcf3/overrides-7.7.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/ef/af/4fbc8cab944db5d21b7e2a5b8e9211a03a79852b1157e2c102fcc61ac440/pandocfilters-1.5.1-py2.py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/cc/55/f09223d75061e2bf6006e8484fcc0278d1b2691c6e6e0988730907b5d5c8/panta_rhei-0.6.0-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/25/33/c512e0b416f9f7d1368c333609fc0883c78a5fd205976cd99885a2707788/panta_rhei-0.6.1-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/c6/ac/dac4a63f978e4dcb3c6d3a78c4d8e0192a113d288502a1216950c41b1027/parso-0.8.4-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/9e/c3/059298687310d527a58bb01f3b1965787ee3b40dce76752eda8b44e9a2c5/pexpect-4.9.0-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/48/a4/fbfe9d5581d7b111b28f1d8c2762dee92e9821bb209af9fa83c940e507a0/pillow-11.1.0-cp311-cp311-manylinux_2_28_x86_64.whl
@@ -346,6 +345,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/5a/84/44687a29792a70e111c5c477230a72c4b957d88d16141199bf9acb7537a3/websocket_client-1.8.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/21/02/88b65cc394961a60c43c70517066b6b679738caf78506a5da7b88ffcb643/widgetsnbextension-4.0.13-py3-none-any.whl
       - pypi: .
+      - pypi: ../gmri2fem
 packages:
 - conda: https://conda.anaconda.org/conda-forge/linux-64/_libgcc_mutex-0.1-conda_forge.tar.bz2
   sha256: fe51de6107f9edc7aa4f786a70f4a883943bc9d39b3bb7307c04c41410990726
@@ -1369,24 +1369,28 @@ packages:
   - pkg:pypi/gmpy2?source=hash-mapping
   size: 202814
   timestamp: 1733462674178
-- pypi: git+https://github.com/jorgenriseth/gmri2fem#6cfd3935b98b14d4d6df4959d1ff97f909968bf7
+- pypi: ../gmri2fem
   name: gmri2fem
   version: 0.0.1
+  sha256: 4401a1ef4ede091c521f728777b70275162b3b321edfb1c2943912fb0f9102bb
   requires_dist:
-  - loguru>=0.7.2
-  - matplotlib>=3.9.2
-  - meshio>=5.3.5
-  - nibabel>=5.3.2
-  - numpy<2.0
-  - pint>=0.24.3
-  - pydicom>=2.4.4
-  - pymeshfix>=0.17.0
-  - pyvista>=0.44.1
-  - scikit-image>=0.24.0
-  - scipy>=1.13.1
-  - tqdm>=4.66.6
+  - loguru
+  - matplotlib
+  - meshio
+  - nibabel
+  - numpy
+  - pint
+  - pydicom
+  - pymeshfix
+  - pyvista
+  - scikit-image
+  - scipy
+  - tqdm
   - simple-mri
+  - panta-rhei
+  - click>=8.1.8
   requires_python: '>=3.9,<3.13'
+  editable: true
 - pypi: https://files.pythonhosted.org/packages/30/cb/44245b93105e93ca0223f4dfbfd199803b10770e79dee63f63cb755570e0/gmsh-4.13.1-py2.py3-none-manylinux_2_24_x86_64.whl
   name: gmsh
   version: 4.13.1
@@ -1394,7 +1398,7 @@ packages:
 - pypi: .
   name: gonzo
   version: 0.1.0
-  sha256: 86491f41485411e3f0f0d7efa025e73aeefd9f2924cff4da384f46304229d3e6
+  sha256: 3abb996a1e59dbce7ec8470e3521a97c53744870e9d0fc595e4d7ecc298155ae
   requires_dist:
   - numpy
   - matplotlib
@@ -3831,10 +3835,10 @@ packages:
   version: 1.5.1
   sha256: 93be382804a9cdb0a7267585f157e5d1731bbe5545a85b268d6f5fe6232de2bc
   requires_python: '>=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*'
-- pypi: https://files.pythonhosted.org/packages/cc/55/f09223d75061e2bf6006e8484fcc0278d1b2691c6e6e0988730907b5d5c8/panta_rhei-0.6.0-py3-none-any.whl
+- pypi: https://files.pythonhosted.org/packages/25/33/c512e0b416f9f7d1368c333609fc0883c78a5fd205976cd99885a2707788/panta_rhei-0.6.1-py3-none-any.whl
   name: panta-rhei
-  version: 0.6.0
-  sha256: 64f6e2ebe6939a27abe4d0b3fb163301e149af0dba26e6ef2825438185c4b402
+  version: 0.6.1
+  sha256: e8fd678234cb875f35b79d1d5a6d27926d4c3373a769282d23e173d584af0e42
   requires_dist:
   - loguru
   - sympy
