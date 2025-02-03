@@ -1394,7 +1394,7 @@ packages:
 - pypi: .
   name: gonzo
   version: 0.1.0
-  sha256: 48756217c876298d79ba0cff0801e35f28fbb92727438eac29f48098721c79e7
+  sha256: 86491f41485411e3f0f0d7efa025e73aeefd9f2924cff4da384f46304229d3e6
   requires_dist:
   - numpy
   - matplotlib

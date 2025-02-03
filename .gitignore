@@ -2,7 +2,8 @@
 mri_dataset
 mri_processed_data
 figures
-notebooks
+notebooks/*
+!notebooks/Gonzo-DICOM-extraction.ipynb
 
 
 *.xdmf
