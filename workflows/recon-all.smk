@@ -42,3 +42,28 @@ rule recon_all_FLAIR:
     " -cm"
     " -parallel"
     " -all"
+
+
+rule fastsurfer:
+    input:
+        t1="mri_dataset/{subject}/ses-01/anat/{subject}_ses-01_T1w.nii.gz"
+    output:
+        segmentations=protected(expand(
+            "mri_processed_data/fastsurfer/{{subject}}/mri/{seg}.mgz",
+            seg=["aparc+aseg", "aseg", "wmparc"]
+        )),
+        surfs=protected(expand(
+            "mri_processed_data/fastsurfer/{{subject}}/surf/{surf}",
+            surf=["lh.pial", "rh.pial", "lh.white", "rh.white"]
+        ))
+    container: "docker://deepmi/fastsurfer:cuda-v2.3.3"
+    shell:
+      "/fastsurfer/run_fastsurfer.sh"
+      " --fs_license singularity/license.txt"
+      " --t1 $(realpath {input.t1})"
+      " --sid {wildcards.subject}"
+      " --sd $(realpath $(dirname {output[0]})/../..)"
+      " --parallel"
+      " --3T"
+      " --viewagg_device 'cpu'"
+
