@@ -40,3 +40,9 @@ snakemake = ">=8.0.0"
 svmtk = ">=1.3.0"
 fenics = ">=2019"
 h5py = ">=3.0.0"
+
+[tool.pixi.feature.cluster.dependencies]
+snakemake-executor-plugin-cluster-generic = "*"
+
+[tool.pixi.environments]
+cluster = ["cluster"]
