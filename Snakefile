@@ -17,35 +17,11 @@ wildcard_constraints:
   session = r"ses-\d{2}",
   resolution = r"\d+"
 
-if "subjects" in config:
-	SUBJECTS=config["subjects"]
-else:
-  SUBJECTS = [p.stem for p in Path("mri_dataset/").glob("sub-*")]
-  config["subjects"] = SUBJECTS
-
-if "ignore_subjects" in config:
-  for subject in config["ignore_subjects"]:
-    SUBJECTS.remove(subject)
-  config["subjects"] = SUBJECTS
-
+SUBJECTS = ["sub-01"]
 SESSIONS = {
   subject: sorted([p.stem for p in Path(f"mri_dataset/{subject}").glob("ses-*")])
   for subject in SUBJECTS
 }
-config["sessions"] = SESSIONS
-config["FS_DIR"] = "mri_processed_data/freesurfer/{subject}"
-
-rule all:
-  output: 
-    "build-archive/freesurfer.zip",
-    "build-archive/mesh-data.zip",
-    "build-archive/mri-dataset.zip",
-    "build-archive/mri-dataset-precontrast-only.zip",
-    "build-archive/mri-processed.zip",
-    "build-archive/surfaces.zip"
-  shell:
-    "bash ./scripts/archive.sh"
-
 
 include: "workflows/T1maps.smk"
 include: "workflows/T1w.smk"
@@ -57,3 +33,55 @@ include: "workflows/statistics.smk"
 include: "workflows/mesh-generation.smk"
 include: "workflows/mri2fem.smk"
 include: "workflows/recon-all.smk"
+
+
+def list_leaves():
+    with open("build-archive/pipeline-leaf-files.txt") as f:
+      return f.read().splitlines()
+
+rule all:
+  input: list_leaves()
+  output: 
+    "build-archive/freesurfer.zip",
+    "build-archive/mesh-data.zip",
+    "build-archive/mri-dataset.zip",
+    "build-archive/mri-dataset-precontrast-only.zip",
+    "build-archive/mri-processed.zip",
+    "build-archive/surfaces.zip"
+  shell:
+    "bash ./scripts/archive.sh"
+
+
+rule download_raw:
+  output:
+    [
+      f"mri_dataset/sub-01/{ses}/anat/sub-01_{ses}_T1w{suffix}"
+      for ses in SESSIONS["sub-01"] for suffix in [".nii.gz", ".json"]
+    ],
+    [
+      f"mri_dataset/sub-01/{ses}/anat/sub-01_{ses}_acq-looklocker_IRT1{suffix}"
+      for ses in SESSIONS["sub-01"] for suffix in [".nii.gz", ".json", "_trigger_times.txt"]
+    ],
+    [
+      f"mri_dataset/sub-01/{ses}/mixed/sub-01_{ses}_acq-mixed{suffix}" 
+      for ses in SESSIONS["sub-01"] 
+      for suffix in ["_SE-modulus.nii.gz", "_T1map_scanner.nii.gz", "_IR-corrected-real.nii.gz", ".json", "_meta.json"]
+    ],
+    [
+      f"mri_dataset/sub-01/ses-01/dwi/sub-01_ses-01_acq-multiband_sense_dir-AP_DTI{suffix}"
+      for suffix in [".nii.gz", ".bval", ".bvec", ".json", "_ADC.nii.gz"]
+    ],
+    [
+      f"mri_dataset/sub-01/ses-01/dwi/sub-01_ses-01_acq-multiband_sense_dir-PA_b0{suffix}"
+      for suffix in [".nii.gz", ".bval", ".bvec", ".json"]
+    ],
+    [
+      f"mri_daaset/sub-01/ses-01/anat/sub-01_ses-01_T2w{suffix}" for suffix in [".nii.gz", ".json"]
+    ],
+    [
+      f"mri_daaset/sub-01/ses-01/anat/sub-01_ses-01_FLAIR{suffix}" for suffix in [".nii.gz", ".json"]
+    ],
+    "mri_dataset/timetable.tsv"
+  shell:
+    "python scripts/zenodo_download.py --filename mri_dataset.zip --output /tmp &&" 
+    " unzip -o /tmp/mri_dataset.zip -d . "

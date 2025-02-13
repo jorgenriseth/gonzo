@@ -110,7 +110,7 @@ rule fenics2mri_pseudoinverse:
   input:
     expand(
       "{subject}/modeling/resolution{res}/mris/data_{idx}.nii.gz",
-      subject=config["subjects"],
+      subject=SUBJECTS,
       res=config["resolution"],
       idx=range(5)
     )
