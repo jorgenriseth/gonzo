@@ -9,8 +9,8 @@ container: "singularity/gonzo.sif"
 if DeploymentMethod.APPTAINER in workflow.deployment_settings.deployment_method:
   shell.prefix(
     "set -eo pipefail; "
-    + "pixi run "
-    # + "ls -l && "
+    "source /opt/conda/etc/profile.d/conda.sh && "
+    "conda activate gonzo && "
 )
 
 wildcard_constraints:
