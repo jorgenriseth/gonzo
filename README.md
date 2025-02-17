@@ -7,20 +7,18 @@ This document describes how to setup and run each step of the processing pipelin
 ### Dependencies
 - `FreeSurfer`
 - `FSL`
-- `snakemake`
-- `conda`/`mamba`
+- `conda/mamba` 
 - `greedy` (https://github.com/pyushkevich/greedy)
 - `gmri2fem`: (https://github.com/jorgenriseth/gMRI2FEM)
 
 Either consult their web-pages or see the `%post`-section in `singularity/gonzo.def` for instructions on how to install FreeSurfer, greedy and conda.
 
 ## Setup
-
 ### Python-environment:
 Assuming `conda` is installed, create and activate the environment by running
-```bash
-conda env create -n gmri2fem -f environment.yml
-conda activate gmri2fem
+```
+conda env create -n gonzo -f environment.yml
+conda activate gonzo
 ```
 
 ### Singularity
@@ -35,6 +33,7 @@ pixi run snakemake {file-to-process} --use-singularity
 ```
 
 ### Download the data
+Information regarding the organization of the data may be found together with the data record at: https://zenodo.org/uploads/14266867.
 The script `scripts/zenodo_download.py` uses the Zenodo REST API to list and/or download all or specific files.
 It requires `pydantic_settings` which is installable through pip. 
 To download the data, create an `.env`-file in the root directory of this repository with the following content:
@@ -53,6 +52,18 @@ python scripts/zenodo_download.py --all  --output outputdir
 
 # Download only the file "README.md" into the current directoryp
 python scripts/zenodo_download.py --filename README.md --output .
+```
+
+### Run `snakemake`
+```bash
+pixi run snakemake data.vtk [--dry-run]  # Recommend dry-run first to see the list of jobs needed to generate the files. The remove them to run the jobs.
+```
+NB: If you have already activated the environment using `pixi shell`, you can drop `pixi run` from this command.
+
+### Noise-estimation
+Several scripts for investigating the effect of noise on $T_1$-estimates for both the Look-Locker and the mixed IR/SE sequence are available in `scripts/mri_noise_analysis`. Change to that directory and run the scripts from command line. To see possible command line arguments, run e.g.
+```bash
+python plot_noise_combined.py --help
 ```
 
 ### `snakeconfig`
@@ -82,7 +93,4 @@ The dataset is split into two main directories,
     - `sub-01`: Folder for processed data for the given subject, such as registered images, concentration-estimates meshes and statistics.
 
 
-Note that the `snakemake`-files in `workflows_additional` specifies workflows by desired outputs, necessary inputs, and shell command to be executed in a relatively easy to read format. Consulting these files might answer several questions regarding the expected structure.
-
-
-
+Note that the `snakemake`-files in `workflows` specifies workflows by desired outputs, necessary inputs, and shell command to be executed in a relatively easy to read format. Consulting these files might answer several questions regarding the expected structure.
