@@ -15,10 +15,6 @@ This document describes how to setup and run each step of the processing pipelin
 Either consult their web-pages or see the `%post`-section in `singularity/gonzo.def` for instructions on how to install FreeSurfer, greedy and conda.
 
 ## Setup
-``` bash
-conda env create -n gmri2fem -f environment.yml
-conda activate gmri2fem
-```
 
 ### Python-environment:
 Assuming `conda` is installed, create and activate the environment by running
@@ -30,6 +26,7 @@ conda activate gmri2fem
 ### Singularity
 If desired, the pipeline can be run in a singularity-container. To build the container, run
 ```bash
+singularity build singularity/gonzo-conda.sif singularity/gonzo-conda.def;
 singularity build singularity/gonzo.sif singularity/gonzo.def
 ```
 Once built, the `snakemake` pipeline may be run by container can be run using 

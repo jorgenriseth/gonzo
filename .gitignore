@@ -1,11 +1,14 @@
+build-archive
 .snakemake
 mri_dataset
 mri_processed_data
 figures
 notebooks/*
 !notebooks/Gonzo-DICOM-extraction.ipynb
+*.sif
 
 
+*.sif
 *.xdmf
 *.h5
 *.hdf

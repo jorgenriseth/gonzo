@@ -68,4 +68,3 @@ rule fastsurfer:
       " --threads {threads}"
       " --no_hypothal"
       " --viewagg_device 'cpu'"
-

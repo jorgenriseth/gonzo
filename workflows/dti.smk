@@ -29,7 +29,7 @@ rule generate_acquisition_params_file:
 
 rule topup_correct:
   input:
-    b0="mri_dataset/{subject}/ses-01/dwi/{subject}_ses-01_acq-multiband_sense_topup_b0.nii.gz",
+    b0="mri_dataset/derivatives/{subject}/ses-01/dwi/{subject}_ses-01_acq-multiband_sense_topup_b0.nii.gz",
     acqparams="mri_dataset/derivatives/{subject}/ses-01/dwi/{subject}_ses-01_acq-multiband_sense_topup_acq_params.txt"
   output:
     topup_fieldcoeff="mri_dataset/derivatives/{subject}/ses-01/dwi/{subject}_ses-01_acq-multiband_sense_topup_output_fieldcoef.nii.gz",
