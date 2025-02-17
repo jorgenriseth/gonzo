@@ -180,6 +180,8 @@ rule reslice_dti:
     "mri_processed_data/{subject}/registered/{subject}_ses-01_dDTI_tensor_registered.nii.gz",
     "mri_processed_data/{subject}/registered/{subject}_ses-01_dDTI_MD_registered.nii.gz",
     "mri_processed_data/{subject}/registered/{subject}_ses-01_dDTI_FA_registered.nii.gz",
+    [f"mri_processed_data/{{subject}}/registered/{{subject}}_ses-01_dDTI_V{idx}_registered.nii.gz" for idx in range(1, 4)],
+    [f"mri_processed_data/{{subject}}/registered/{{subject}}_ses-01_dDTI_L{idx}_registered.nii.gz" for idx in range(1, 4)],
   threads: 4
   shell:
       "gmri2fem dti reslice-dti"

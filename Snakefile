@@ -76,12 +76,12 @@ rule download_raw:
       for suffix in [".nii.gz", ".bval", ".bvec", ".json"]
     ],
     [
-      f"mri_daaset/sub-01/ses-01/anat/sub-01_ses-01_T2w{suffix}" for suffix in [".nii.gz", ".json"]
+      f"mri_dataset/sub-01/ses-01/anat/sub-01_ses-01_T2w{suffix}" for suffix in [".nii.gz", ".json"]
     ],
     [
-      f"mri_daaset/sub-01/ses-01/anat/sub-01_ses-01_FLAIR{suffix}" for suffix in [".nii.gz", ".json"]
+      f"mri_dataset/sub-01/ses-01/anat/sub-01_ses-01_FLAIR{suffix}" for suffix in [".nii.gz", ".json"]
     ],
     "mri_dataset/timetable.tsv"
   shell:
-    "python scripts/zenodo_download.py --filename mri_dataset.zip --output /tmp &&" 
-    " unzip -o /tmp/mri_dataset.zip -d . "
+    "python scripts/zenodo_download.py --filename mri-dataset.zip --output /tmp &&" 
+    " unzip -o /tmp/mri-dataset.zip -d . "
