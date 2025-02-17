@@ -5,7 +5,6 @@ The data record is available at (Zenodo-link).
 This document describes how to setup and run each step of the processing pipeline. If you are only interested in downloading the data, you can skip ahead to [download the data](#download-the-data).
 ## Setup
 ### Dependencies
-- `pixi` Python package manager: https://pixi.sh/latest/. ([Why pixi?](https://ericmjl.github.io/blog/2024/8/16/its-time-to-try-out-pixi/))
 - `FreeSurfer`
 - `FSL`
 - `greedy` (https://github.com/pyushkevich/greedy)
