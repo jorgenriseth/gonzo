@@ -11,19 +11,26 @@ This document describes how to setup and run each step of the processing pipelin
 - `greedy` (https://github.com/pyushkevich/greedy)
 - `gmri2fem`: (https://github.com/jorgenriseth/gMRI2FEM)
 
-Either consult their web-pages or see the `%post`-section in `singularity/fs-greedy.def` for instructions on how to install FreeSurfer, greedy and conda.
+Either consult their web-pages or see the `%post`-section in `singularity/gonzo.def` for instructions on how to install FreeSurfer, greedy and conda.
 
 ## Setup
-### Install `pixi`
-Install pixi by:
-```bash
-curl -fsSL https://pixi.sh/install.sh | bash
+### Python-environment:
+Assuming `conda` is installed, create and activate the environment by running
 ```
-To activate the python environment, run
-```bash
-pixi shell
+conda env create -n gonzo -f environment.yml
+conda activate gonzo
 ```
-from the project root. The first time you run this, `pixi` will create the environment and install all necessary packages.
+
+### Singularity
+If desired, the pipeline can be run in a singularity-container. To build the container, run
+```bash
+singularity build singularity/gonzo-conda.sif singularity/gonzo-conda.def;
+singularity build singularity/gonzo.sif singularity/gonzo.def
+```
+Once built, the `snakemake` pipeline may be run by container can be run using 
+```bash
+pixi run snakemake {file-to-process} --use-singularity
+```
 
 ### Download the data
 Information regarding the organization of the data may be found together with the data record at: https://zenodo.org/uploads/14266867.
@@ -69,3 +76,21 @@ resolution: [32,]  # list of desired SVMTK-resolutions to generate the meshes fo
 - `Snakefile`: Top-level snakefile defining each step of the processing pipeline. 
 - `workflows/`: Contains files to be imported into the top-level `Snakefile` and specifies workflows in a modular way.
 
+### Data
+The dataset is split into two main directories,
+- #### `mri_dataset`
+    The `mri_dataset` follows a BIDS-like structure and should contain the following directories
+    - `sub-01`: MRI-data converted from DICOM-format to Nifti. For further details on the conversion see `notebooks/Gonzo-DICOM-extraction.ipynb`.
+        - Organized according to: 
+            `sub-01/ses-[XX]/[anat|dti|mixed]/sub-01_ses-[XX]_ADDITIONALINFO.nii.gz`.
+        - All MRI-images comes with a "sidecar"-file in `json`-format providing additional information in the same directory as the image.
+    - `derivatives/sub-01`: Contains MRI-data directly derived from the Niftii-files in the subject folders, such as T1-maps derived from LookLocker using NordicICE, or from Mixed-sequences using the provided code. Also contains a table with sequence acquisition times in seconds, relative to injection_time.
+
+- ### `mri_processed_data`
+    The `mri_processed_data`-folder contains information and data which are not organized according to the `BIDS`-format, either due to incompatibility of software, or if another organization greatly simplifies processing.
+    It will typically contain the following directories:
+    - `freesurfer/sub-01`: Output of Freesurfer's `recon-all` for given subject.
+    - `sub-01`: Folder for processed data for the given subject, such as registered images, concentration-estimates meshes and statistics.
+
+
+Note that the `snakemake`-files in `workflows` specifies workflows by desired outputs, necessary inputs, and shell command to be executed in a relatively easy to read format. Consulting these files might answer several questions regarding the expected structure.

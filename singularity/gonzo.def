@@ -1,33 +1,15 @@
-Bootstrap: docker
-From: ubuntu:jammy
+Bootstrap: localimage
+From: singularity/gonzo-conda.sif
+
+%arguments
+  CONDA_ENV_NAME="gonzo"
 
 %files
-  freesurfer_ubuntu22-7.4.1_amd64.deb
-  greedy.tar.gz
+  environment.yml
+  pyproject.toml
+  submodules/gmri2fem/pyproject.toml 
+  submodules/gmri2fem/src
 
 %post
-  # need wget to download binaries
-  apt-get update
-  DEBIAN_FRONTEND=noninteractive apt-get install -y wget curl bzip2 ca-certificates
-
-  # Download and install greedy
-  wget https://sourceforge.net/projects/greedy-reg/files/Nightly/greedy-nightly-Linux-gcc64.tar.gz/download -O greedy.tar.gz
-  tar xvfz greedy.tar.gz 
-  rm greedy.tar.gz
-
-  # Download and install freesurfer. Remove installer afterwards to reduce image.
-  wget https://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/7.4.1/freesurfer_ubuntu22-7.4.1_amd64.deb
-  DEBIAN_FRONTEND=noninteractive apt install -y ./freesurfer_ubuntu22-7.4.1_amd64.deb
-  rm freesurfer_ubuntu22-7.4.1_amd64.deb
-
-  curl -fsSL https://pixi.sh/install.sh | bash
-
-
-%environment
-  export FREESURFER_HOME="/usr/local/freesurfer/7.4.1"
-  export FS_LICENSE=/license.txt
-  source $FREESURFER_HOME/SetUpFreeSurfer.sh
-
-  export PATH="/usr/local/freesurfer/7.4.1/bin:$PATH"
-  export PATH="/greedy-1.3.0-alpha-Linux-gcc64/bin:$PATH"
-  export PATH="/root/.pixi/bin:$PATH"
+  export CONDA_ENV_NAME={{ CONDA_ENV_NAME }}
+  /opt/conda/bin/conda env create -n $CONDA_ENV_NAME -f environment.yml

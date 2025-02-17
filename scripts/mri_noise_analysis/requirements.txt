@@ -1,7 +1,4 @@
 matplotlib
 numpy
 click
-nibabel
-simple_mri
-vtk
 scipy

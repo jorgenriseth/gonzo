@@ -66,11 +66,12 @@ rule hdf2vtk:
     input:
         "mri_processed_data/{subject}/modeling/resolution{res}/data.hdf"
     output:
-        "mri_processed_data/{subject}/modeling/resolution{res}/data.vtk"
+        "mri_processed_data/{subject}/modeling/resolution{res}/data.vtu"
     shell:
         "gmri2fem i2m hdf2vtk"
         " --input {input}"
         " --output {output}"
+        " --ascii"
 
 
 
@@ -109,7 +110,7 @@ rule fenics2mri_pseudoinverse:
   input:
     expand(
       "{subject}/modeling/resolution{res}/mris/data_{idx}.nii.gz",
-      subject=config["subjects"],
+      subject=SUBJECTS,
       res=config["resolution"],
       idx=range(5)
     )

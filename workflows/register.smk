@@ -23,7 +23,6 @@ rule register_all:
     ]
 
 
-ruleorder: reference_image > reslice_T1w
 rule reference_image:
   input:
     "mri_dataset/{subject}/ses-01/anat/{subject}_ses-01_T1w.nii.gz"
@@ -76,6 +75,24 @@ use rule reslice as reslice_T1w with:
     transform="mri_processed_data/{subject}/transforms/{subject}_{session}_T1w.mat"
   output:
     "mri_processed_data/{subject}/registered/{subject}_{session}_T1w_registered.nii.gz",
+
+
+# FLAIR
+use rule register as register_FLAIR with:
+  input:
+    fixed="mri_processed_data/{subject}/registered/{subject}_ses-01_FLAIR_registered.nii.gz",
+    moving="mri_dataset/{subject}/{session}/anat/{subject}_{session}_FLAIR.nii.gz"
+  output:
+    "mri_processed_data/{subject}/transforms/{subject}_{session}_FLAIR.mat"
+
+
+use rule reslice as reslice_FLAIR with:
+  input:
+    fixed="mri_processed_data/{subject}/registered/{subject}_ses-01_FLAIR_registered.nii.gz",
+    moving="mri_dataset/{subject}/{session}/anat/{subject}_{session}_FLAIR.nii.gz",
+    transform="mri_processed_data/{subject}/transforms/{subject}_{session}_FLAIR.mat"
+  output:
+    "mri_processed_data/{subject}/registered/{subject}_{session}_FLAIR_registered.nii.gz",
 
 
 # T2w
@@ -163,6 +180,8 @@ rule reslice_dti:
     "mri_processed_data/{subject}/registered/{subject}_ses-01_dDTI_tensor_registered.nii.gz",
     "mri_processed_data/{subject}/registered/{subject}_ses-01_dDTI_MD_registered.nii.gz",
     "mri_processed_data/{subject}/registered/{subject}_ses-01_dDTI_FA_registered.nii.gz",
+    [f"mri_processed_data/{{subject}}/registered/{{subject}}_ses-01_dDTI_V{idx}_registered.nii.gz" for idx in range(1, 4)],
+    [f"mri_processed_data/{{subject}}/registered/{{subject}}_ses-01_dDTI_L{idx}_registered.nii.gz" for idx in range(1, 4)],
   threads: 4
   shell:
       "gmri2fem dti reslice-dti"
