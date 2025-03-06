@@ -1,0 +1,14 @@
+#!/bin/bash
+#SBATCH --job-name=snakerunner
+#SBATCH --partition=defq
+#SBATCH --time='48:00:00'
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=1
+#SBATCH --output=logs/%x-%j.txt
+
+module load singularity-ce
+echo $@
+profile=$1
+shift;
+snakemake -p --profile $profile $@

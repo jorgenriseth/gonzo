@@ -1,4 +1,5 @@
-build-archive
+build-record/*
+!build-record/archive.sh
 .snakemake
 mri_dataset
 mri_processed_data

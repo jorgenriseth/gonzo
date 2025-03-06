@@ -36,20 +36,20 @@ include: "workflows/recon-all.smk"
 
 
 def list_leaves():
-    with open("build-archive/pipeline-leaf-files.txt") as f:
+    with open("build-record/pipeline-leaf-files.txt") as f:
       return f.read().splitlines()
 
 rule all:
   input: list_leaves()
-  output: 
-    "build-archive/freesurfer.zip",
-    "build-archive/mesh-data.zip",
-    "build-archive/mri-dataset.zip",
-    "build-archive/mri-dataset-precontrast-only.zip",
-    "build-archive/mri-processed.zip",
-    "build-archive/surfaces.zip"
-  shell:
-    "bash ./scripts/archive.sh"
+#   output: 
+#     "build-record/freesurfer.zip",
+#     "build-record/mesh-data.zip",
+#     "build-record/mri-dataset.zip",
+#     "build-record/mri-dataset-precontrast-only.zip",
+#     "build-record/mri-processed.zip",
+#     "build-record/surfaces.zip"
+#   shell:
+#     "bash ./build-record/archive.sh"
 
 
 rule download_raw:

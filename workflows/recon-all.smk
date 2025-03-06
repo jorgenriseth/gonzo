@@ -56,7 +56,7 @@ rule fastsurfer:
             "mri_processed_data/fastsurfer/{{subject}}/surf/{surf}",
             surf=["lh.pial", "rh.pial", "lh.white", "rh.white"]
         ))
-    threads: 10
+    threads: config["fastsurfer-threads"]
     shell:
       "/fastsurfer/run_fastsurfer.sh"
       " --fs_license $(realpath singularity/license.txt)"
