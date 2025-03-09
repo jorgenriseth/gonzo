@@ -22,6 +22,11 @@ SESSIONS = {
   subject: sorted([p.stem for p in Path(f"mri_dataset/{subject}").glob("ses-*")])
   for subject in SUBJECTS
 }
+if "use-fastsurfer" in config and config["use-fastsurfer"]:
+  FS_DIR = "mri_processed_data/fastsurfer"
+else:
+  FS_DIR = "mri_processed_data/freesurfer"
+
 
 include: "workflows/T1maps.smk"
 include: "workflows/T1w.smk"
@@ -41,47 +46,38 @@ def list_leaves():
 
 rule all:
   input: list_leaves()
-#   output: 
-#     "build-record/freesurfer.zip",
-#     "build-record/mesh-data.zip",
-#     "build-record/mri-dataset.zip",
-#     "build-record/mri-dataset-precontrast-only.zip",
-#     "build-record/mri-processed.zip",
-#     "build-record/surfaces.zip"
-#   shell:
-#     "bash ./build-record/archive.sh"
 
 
-rule download_raw:
-  output:
-    [
-      f"mri_dataset/sub-01/{ses}/anat/sub-01_{ses}_T1w{suffix}"
-      for ses in SESSIONS["sub-01"] for suffix in [".nii.gz", ".json"]
-    ],
-    [
-      f"mri_dataset/sub-01/{ses}/anat/sub-01_{ses}_acq-looklocker_IRT1{suffix}"
-      for ses in SESSIONS["sub-01"] for suffix in [".nii.gz", ".json", "_trigger_times.txt"]
-    ],
-    [
-      f"mri_dataset/sub-01/{ses}/mixed/sub-01_{ses}_acq-mixed{suffix}" 
-      for ses in SESSIONS["sub-01"] 
-      for suffix in ["_SE-modulus.nii.gz", "_T1map_scanner.nii.gz", "_IR-corrected-real.nii.gz", ".json", "_meta.json"]
-    ],
-    [
-      f"mri_dataset/sub-01/ses-01/dwi/sub-01_ses-01_acq-multiband_sense_dir-AP_DTI{suffix}"
-      for suffix in [".nii.gz", ".bval", ".bvec", ".json", "_ADC.nii.gz"]
-    ],
-    [
-      f"mri_dataset/sub-01/ses-01/dwi/sub-01_ses-01_acq-multiband_sense_dir-PA_b0{suffix}"
-      for suffix in [".nii.gz", ".bval", ".bvec", ".json"]
-    ],
-    [
-      f"mri_dataset/sub-01/ses-01/anat/sub-01_ses-01_T2w{suffix}" for suffix in [".nii.gz", ".json"]
-    ],
-    [
-      f"mri_dataset/sub-01/ses-01/anat/sub-01_ses-01_FLAIR{suffix}" for suffix in [".nii.gz", ".json"]
-    ],
-    "mri_dataset/timetable.tsv"
-  shell:
-    "python scripts/zenodo_download.py --filename mri-dataset.zip --output /tmp &&" 
-    " unzip -o /tmp/mri-dataset.zip -d . "
+  #rule download_raw:
+  #  output:
+  #    [
+  #      f"mri_dataset/sub-01/{ses}/anat/sub-01_{ses}_T1w{suffix}"
+  #      for ses in SESSIONS["sub-01"] for suffix in [".nii.gz", ".json"]
+  #    ],
+  #    [
+  #      f"mri_dataset/sub-01/{ses}/anat/sub-01_{ses}_acq-looklocker_IRT1{suffix}"
+  #      for ses in SESSIONS["sub-01"] for suffix in [".nii.gz", ".json", "_trigger_times.txt"]
+  #    ],
+  #    [
+  #      f"mri_dataset/sub-01/{ses}/mixed/sub-01_{ses}_acq-mixed{suffix}" 
+  #      for ses in SESSIONS["sub-01"] 
+  #      for suffix in ["_SE-modulus.nii.gz", "_T1map_scanner.nii.gz", "_IR-corrected-real.nii.gz", ".json", "_meta.json"]
+  #    ],
+  #    [
+  #      f"mri_dataset/sub-01/ses-01/dwi/sub-01_ses-01_acq-multiband_sense_dir-AP_DTI{suffix}"
+  #      for suffix in [".nii.gz", ".bval", ".bvec", ".json", "_ADC.nii.gz"]
+  #    ],
+  #    [
+  #      f"mri_dataset/sub-01/ses-01/dwi/sub-01_ses-01_acq-multiband_sense_dir-PA_b0{suffix}"
+  #      for suffix in [".nii.gz", ".bval", ".bvec", ".json"]
+  #    ],
+  #    [
+  #      f"mri_dataset/sub-01/ses-01/anat/sub-01_ses-01_T2w{suffix}" for suffix in [".nii.gz", ".json"]
+  #    ],
+  #    [
+  #      f"mri_dataset/sub-01/ses-01/anat/sub-01_ses-01_FLAIR{suffix}" for suffix in [".nii.gz", ".json"]
+  #    ],
+  #    "mri_dataset/timetable.tsv"
+  #  shell:
+  #    "python scripts/zenodo_download.py --filename mri-dataset.zip --output /tmp &&" 
+  #    " unzip -o /tmp/mri-dataset.zip -d . "

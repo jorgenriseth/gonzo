@@ -1,7 +1,7 @@
 rule segment_refinements:
   input:
     reference="mri_processed_data/{subject}/registered/{subject}_ses-01_T1w_registered.nii.gz",
-    segmentation="mri_processed_data/freesurfer/{subject}/mri/{seg}.mgz",
+    segmentation=f"{FS_DIR}/{{subject}}/mri/{{seg}}.mgz",
     csfmask="mri_processed_data/{subject}/segmentations/{subject}_seg-csf_binary.nii.gz",
   output:
     refined="mri_processed_data/{subject}/segmentations/{subject}_seg-{seg}_refined.nii.gz",

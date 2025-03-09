@@ -1,2 +1,5 @@
 resolution: [32]
+use-fastsurfer: True
 fastsurfer-threads: 8
+FS-pial-contrast: "T2"
+
