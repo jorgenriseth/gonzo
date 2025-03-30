@@ -44,7 +44,6 @@ rule dtifit:
     " -i {input.dti}"
     " -b {input.bvals}"
     " -o $(echo {output[0]} | sed s/_MD.nii.gz//)"
-    " --tmppath $HOME/dtitest"
 
 
 rule clean_dti:

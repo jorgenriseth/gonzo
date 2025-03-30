@@ -10,7 +10,7 @@ rule fastsurfer:
             "mri_processed_data/fastsurfer/{{subject}}/surf/{surf}",
             surf=["lh.pial", "rh.pial", "lh.white", "rh.white"]
         ))
-    threads: config["fastsurfer-threads"]
+    threads: 0.25 * workflow.cores
     shell:
       "/fastsurfer/run_fastsurfer.sh"
       " --fs_license $(realpath singularity/license.txt)"
@@ -50,6 +50,7 @@ rule recon_all_setup_T2:
   shell:
     "mri_convert -c --no_scale 1 {input} {output}"
 
+
 def recon_input(wildcards):
   t1 = f"mri_processed_data/freesurfer/{wildcards.subject}/mri/orig/001.mgz"
   if "FS-pial-contrast" in config:
@@ -62,7 +63,6 @@ def recon_input(wildcards):
 recon_all_cmd = (
   "recon-all"
   + " -all"
-    #  + " -sd $(realpath $(dirname {output.segmentations[0]})/../../)"
   + " -sd mri_processed_data/freesurfer"
   + " -s {wildcards.subject}"
   + " -parallel"
@@ -70,7 +70,7 @@ recon_all_cmd = (
 if "FS-pial-contrast" in config:
   contrast = config["FS-pial-contrast"]
   pial_file = f"mri_processed_data/freesurfer/{{wildcards.subject}}/mri/orig/{contrast}raw.mgz"
-  recon_all_cmd += f" -{contrast}pial"# -{contrast} {pial_file}"
+  recon_all_cmd += f" -{contrast}pial -{contrast} {pial_file}"
 
 rule recon_all:
   input:

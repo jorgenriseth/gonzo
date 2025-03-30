@@ -4,24 +4,23 @@ from pathlib import Path
 shell.executable("bash")
 
 configfile: "snakeconfig.yaml"
-container: "singularity/gonzo.sif"
+singularity: "singularity/gonzo.sif"
+container: "docker://jorgenriseth/gonzo:v0.1.0"
 
 if DeploymentMethod.APPTAINER in workflow.deployment_settings.deployment_method:
   shell.prefix(
     "set -eo pipefail; "
     "source /opt/conda/etc/profile.d/conda.sh && "
     "conda activate gonzo && "
-)
+  )
 
 wildcard_constraints:
   session = r"ses-\d{2}",
   resolution = r"\d+"
 
 SUBJECTS = ["sub-01"]
-SESSIONS = {
-  subject: sorted([p.stem for p in Path(f"mri_dataset/{subject}").glob("ses-*")])
-  for subject in SUBJECTS
-}
+SESSIONS = [f"ses-{idx:02d}" for idx in range(1, 6)"]
+
 if "use-fastsurfer" in config and config["use-fastsurfer"]:
   FS_DIR = "mri_processed_data/fastsurfer"
 else:
