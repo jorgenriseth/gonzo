@@ -11,17 +11,20 @@ if DeploymentMethod.APPTAINER in workflow.deployment_settings.deployment_method:
     "set -eo pipefail; "
     "source /opt/conda/etc/profile.d/conda.sh && "
     "conda activate gonzo && "
-)
+  )
 
 wildcard_constraints:
   session = r"ses-\d{2}",
   resolution = r"\d+"
 
 SUBJECTS = ["sub-01"]
-SESSIONS = {
-  subject: sorted([p.stem for p in Path(f"mri_dataset/{subject}").glob("ses-*")])
-  for subject in SUBJECTS
-}
+SESSIONS = [f"ses-{idx:02d}" for idx in range(1, 6)"]
+
+if "use-fastsurfer" in config and config["use-fastsurfer"]:
+  FS_DIR = "mri_processed_data/fastsurfer"
+else:
+  FS_DIR = "mri_processed_data/freesurfer"
+
 
 include: "workflows/T1maps.smk"
 include: "workflows/T1w.smk"
@@ -36,7 +39,7 @@ include: "workflows/recon-all.smk"
 
 
 def list_leaves():
-    with open("build-archive/pipeline-leaf-files.txt") as f:
+    with open("build-record/pipeline-leaf-files.txt") as f:
       return f.read().splitlines()
 
 rule all:

@@ -33,7 +33,7 @@ rule reference_image:
 
 
 rule register:
-  threads: 10  # Use extra threads to avoid memory overload from parallell jobs
+  threads: workflow.cores  # Use all available threads to avoid memory issues when running multiple simoultaneously
   params:
     metric="NCC 5x5x5"
   shell:

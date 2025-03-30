@@ -1,4 +1,4 @@
-build-archive
+build-record/*.zip
 .snakemake
 .sandbox_env
 mri_dataset
