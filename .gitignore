@@ -1,5 +1,6 @@
 build-archive
 .snakemake
+.sandbox_env
 mri_dataset
 mri_processed_data
 figures
