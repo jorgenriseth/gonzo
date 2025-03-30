@@ -1,13 +1,13 @@
 [project]
 name = "gonzo"
 authors = [
-    {name = "Jørgen Riseth", email = "jnriseth@gmail.com"},
-    {name = "Timo Koch"},
+  { name = "Jørgen Riseth", email = "jnriseth@gmail.com" },
+  { name = "Timo Koch" },
 ]
 version = "0.1.0"
 requires-python = ">=3.9,<3.12"
 readme = "README.md"
-license = {file = "LICENSE"} 
+license = { file = "LICENSE" }
 dependencies = []
 
 [build-system]
@@ -23,7 +23,7 @@ channels = [
   "conda-forge",
   "conda-forge/label/fenics-dev",
   "bioconda",
-  "jorgenriseth"
+  "jorgenriseth",
 ]
 platforms = ["linux-64"]
 
@@ -41,7 +41,7 @@ panta-rhei = ">=0.6.1,<0.7"
 
 [tool.pixi.pypi-dependencies]
 gonzo = { path = ".", editable = true }
-#gmri2fem = { git = "https://github.com/jorgenriseth/gMRI2FEM.git" }
-gmri2fem = { path = "../gmri2fem", editable = true }
+gmri2fem = { git = "https://github.com/jorgenriseth/gMRI2FEM.git" }
+#gmri2fem = { path = "../gmri2fem", editable = true }
 
 [tool.pixi.tasks]

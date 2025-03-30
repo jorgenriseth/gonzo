@@ -28,7 +28,7 @@ rule generate_mesh:
     hdf="mri_processed_data/{subject}/modeling/resolution{res}/mesh.hdf",
     xdmf="mri_processed_data/{subject}/modeling/resolution{res}/mesh_xdmfs/subdomains.xdmf"
   shell:
-    "gmri2fem brainmeshing meshgen"
+    "gmri2fem brainmeshing mesh-generation"
     " --surface_dir $(dirname {input[0]})"
     " --resolution {wildcards.res}"
     " --output {output.hdf}"

@@ -18,6 +18,8 @@ dependencies:
 - jupyter >=1.1.1,<2
 - python >=3.9,<3.12
 - pantarei >=0.6.2
+- mpi4py
+- openmpi
 - pip
 - pip:
-  - -e ./submodules/gmri2fem
+  - git+https://github.com/jorgenriseth/gMRI2FEM.git
