@@ -22,4 +22,4 @@ dependencies:
 - python >=3.9,<3.12
 - pip
 - pip:
-  - gmri2fem>=0.1.2, <0.2
+  - gmri2fem>=0.1.3
