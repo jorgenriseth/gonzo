@@ -4,7 +4,7 @@ from pathlib import Path
 shell.executable("bash")
 
 configfile: "snakeconfig.yaml"
-container: "docker://jorgenriseth/gonzo:v0.1.0"
+container: "docker://jorgenriseth/gonzo:v0.1.2"
 
 if DeploymentMethod.APPTAINER in workflow.deployment_settings.deployment_method:
   shell.prefix(
