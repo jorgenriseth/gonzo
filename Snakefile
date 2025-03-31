@@ -4,7 +4,7 @@ from pathlib import Path
 shell.executable("bash")
 
 configfile: "snakeconfig.yaml"
-container: "docker://jorgenriseth/gonzo:v0.1.0"
+container: "docker://jorgenriseth/gonzo:v0.1.1"
 
 if DeploymentMethod.APPTAINER in workflow.deployment_settings.deployment_method:
   shell.prefix(
@@ -18,7 +18,7 @@ wildcard_constraints:
   resolution = r"\d+"
 
 SUBJECTS = ["sub-01"]
-SESSIONS = [f"ses-{idx:02d}" for idx in range(1, 6)"]
+SESSIONS = {"sub-01": [f"ses-{idx:02d}" for idx in range(1, 6)]}
 
 if "use-fastsurfer" in config and config["use-fastsurfer"]:
   FS_DIR = "mri_processed_data/fastsurfer"

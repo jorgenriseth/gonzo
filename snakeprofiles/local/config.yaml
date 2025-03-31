@@ -1,3 +1,2 @@
 use-singularity: True
-singularity-args: "-B singularity/license.txt:/license.txt -B \"submodules/gmri2fem:/submodules/gmri2fem\""
-jobs: 10
+singularity-args: "-B singularity/license.txt:/license.txt"

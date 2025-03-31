@@ -1,6 +1,5 @@
 #!/bin/bash
 #SBATCH --job-name=snakerunner
-#SBATCH --partition=defq
 #SBATCH --time='48:00:00'
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
@@ -10,5 +9,5 @@
 module load singularity-ce
 echo $@
 profile=$1
-shift;
+shift
 snakemake -p --profile $profile $@
