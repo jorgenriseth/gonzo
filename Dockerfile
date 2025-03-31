@@ -16,7 +16,7 @@ RUN apt-get update && \
 
 # Download and install greedy
 WORKDIR /opt
-ENV PATH="/greedy-1.3.0-alpha-Linux-gcc64/bin:$PATH"
+ENV PATH="/opt/greedy-1.3.0-alpha-Linux-gcc64/bin:$PATH"
 RUN wget --no-verbose --show-progress --progress=bar:force:noscroll \
   https://sourceforge.net/projects/greedy-reg/files/Nightly/greedy-nightly-Linux-gcc64.tar.gz/download \
   -O greedy.tar.gz \
