@@ -4,7 +4,7 @@ from pathlib import Path
 shell.executable("bash")
 
 configfile: "snakeconfig.yaml"
-container: "docker://jorgenriseth/gonzo:v0.1.1"
+container: "docker://jorgenriseth/gonzo:v0.1.2"
 
 if DeploymentMethod.APPTAINER in workflow.deployment_settings.deployment_method:
   shell.prefix(
@@ -32,7 +32,7 @@ include: "workflows/register.smk"
 include: "workflows/segment.smk"
 include: "workflows/concentration-estimate.smk"
 include: "workflows/dti.smk"
-include: "workflows/statistics.smk"
+#include: "workflows/statistics.smk"
 include: "workflows/mesh-generation.smk"
 include: "workflows/mri2fem.smk"
 include: "workflows/recon-all.smk"

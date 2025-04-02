@@ -9,12 +9,22 @@ rule preprocess_surfaces:
     "mri_processed_data/{subject}/modeling/surfaces/lh_pial_refined.stl",
     "mri_processed_data/{subject}/modeling/surfaces/rh_pial_refined.stl",
     "mri_processed_data/{subject}/modeling/surfaces/subcortical_gm.stl",
-    "mri_processed_data/{subject}/modeling/surfaces/ventricles.stl",
     "mri_processed_data/{subject}/modeling/surfaces/white.stl",
   shell:
     "gmri2fem brainmeshing process-surfaces"
     " --fs_dir $(dirname $(dirname {input[0]}))"
     " --surface_dir $(dirname {output[0]})"
+
+rule extract_ventricles:
+  input:
+    "mri_processed_data/fastsurfer/{subject}/mri/aseg.mgz",
+  output:
+    "mri_processed_data/{subject}/modeling/surfaces/ventricles.stl",
+  shell:
+    "gmri2fem brainmeshing extract-ventricles"
+    " --fs_dir $(dirname $(dirname {input[0]}))"
+    " --surface_dir $(dirname {output[0]})"
+
 
 
 rule generate_mesh:

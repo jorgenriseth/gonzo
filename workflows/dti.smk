@@ -23,6 +23,7 @@ rule eddy_correct:
     bvecs="mri_dataset/derivatives/{subject}/ses-01/dwi/{subject}_ses-01_acq-multiband_sense_eddy_corrected_data.eddy_rotated_bvecs"
   params:
     multiband_factor=3
+  threads: 4
   shell:
     "gmri2fem dti eddy"
     " -i {input.dti}"
@@ -30,6 +31,8 @@ rule eddy_correct:
     " -a {input.acq_params}"
     " -o {output.nii}"
     " --mb {params.multiband_factor}"
+    " --nthreads {threads}"
+    #" --tmppath 'tmp'"
 
 rule dtifit:
   input:
