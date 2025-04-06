@@ -11,17 +11,18 @@ rule fastsurfer:
             surf=["lh.pial", "rh.pial", "lh.white", "rh.white"]
         ))
     threads: 0.25 * workflow.cores
+    conda: "../envs/fastsurfer.yml"
     shell:
-      "/fastsurfer/run_fastsurfer.sh"
+      "run_fastsurfer.sh"
       " --fs_license $(realpath singularity/license.txt)"
       " --t1 $(realpath {input.t1})"
       " --sid {wildcards.subject}"
-      " --sd $(realpath $(dirname {output[0]})/../..)"
-      " --parallel"
+      " --sd $(realpath -m $(dirname {output[0]})/../..)"
       " --3T"
       " --threads {threads}"
       " --no_hypothal"
       " --viewagg_device 'cpu'"
+      " --py 'python'"
 
 
 rule recon_all_setup:

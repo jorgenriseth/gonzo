@@ -1,7 +1,5 @@
 # Start with the same base image as the Apptainer definition
-FROM deepmi/fastsurfer:cpu-v2.3.3
-USER root
-WORKDIR /
+FROM ubuntu:22.04
 
 # Install dependencies (equivalent to the %post section)
 RUN apt-get update && \
@@ -12,66 +10,72 @@ RUN apt-get update && \
     zip \
     ca-certificates \
     git \
-    libncurses-dev
+    libncurses-dev \
+    libgomp1 \
+    libxml2 \
+    libquadmath0 \
+    vim \ 
+    python3 \
+    tcsh xxd build-essential gfortran \
+    libblas-dev liblapack-dev zlib1g-dev \ 
+    libxmu-dev libxmu-headers libxi-dev libxt-dev libx11-dev libglu1-mesa-dev
+    # && rm -rf /var/lib/apt/lists/*
 
-# Download and install greedy
-WORKDIR /opt
-ENV PATH="/opt/greedy-1.3.0-alpha-Linux-gcc64/bin:$PATH"
-RUN wget --no-verbose --show-progress --progress=bar:force:noscroll \
-  https://sourceforge.net/projects/greedy-reg/files/Nightly/greedy-nightly-Linux-gcc64.tar.gz/download \
-  -O greedy.tar.gz \
-  && tar xvfz greedy.tar.gz \
+WORKDIR /gonzo
+ENV PATH="/gonzo/greedy-1.3.0-alpha-Linux-gcc64/bin:$PATH"
+COPY deps/greedy.tar.gz greedy.tar.gz
+# RUN wget --no-verbose --show-progress --progress=bar:force:noscroll \
+#   https://sourceforge.net/projects/greedy-reg/files/Nightly/greedy-nightly-Linux-gcc64.tar.gz/download -O greedy.tar.gz \
+RUN tar xvfz greedy.tar.gz \
   && rm greedy.tar.gz
 
+ENV PATH="/gonzo/FastSurfer:$PATH"
+COPY deps/FastSurfer FastSurfer
+#RUN git clone --branch stable https://github.com/Deep-MI/FastSurfer.git
+
 # Download and install FSL
-WORKDIR /opt
-ENV FSLDIR=/opt/fsl
-ENV PATH="/opt/fsl/share/fsl/bin:$PATH"
-RUN wget https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/releases/fslinstaller.py && \
-    python fslinstaller.py -d /opt/fsl && \
-    rm fslinstaller.py && \
-    echo '. ${FSLDIR}/etc/fslconf/fsl.sh' >> /etc/bash.bashrc
+ENV FSLDIR=/gonzo/fsl
+COPY deps/fslinstaller.py fslinstaller.py
+#RUN wget https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/releases/fslinstaller.py && \
+RUN python3 fslinstaller.py -d /gonzo/fsl && \
+    rm fslinstaller.py
 
 # Download and install freesurfer. Remove installer afterwards to reduce image.
-ENV FREESURFER_HOME="/opt/freesurfer"
-RUN wget --no-verbose --show-progress --progress=bar:force:noscroll \
-  https://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/7.4.1/freesurfer-linux-ubuntu22_amd64-7.4.1.tar.gz \
-  -O freesurfer.tar.gz \
-  && tar xvfz freesurfer.tar.gz \
-  && rm freesurfer.tar.gz \
-  && echo '. $FREESURFER_HOME/SetUpFreeSurfer.sh' >> /etc/bash.bashrc
+# ENV FREESURFER_HOME="/gonzo/freesurfer"
+# RUN wget --no-verbose --show-progress --progress=bar:force:noscroll \
+#   https://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/7.4.1/freesurfer-linux-ubuntu22_amd64-7.4.1.tar.gz \
+#   -O freesurfer.tar.gz \
+#   && tar xvfz freesurfer.tar.gz \
+#   && rm freesurfer.tar.gz
 
-# Create a script that will be used as the entrypoint to ensure conda environment is activated
-# Create the nonroot user
-RUN useradd -ms /bin/bash nonroot
+# Download and install freesurfer. Remove installer afterwards to reduce image.
+ENV FREESURFER_HOME="/usr/local/freesurfer/7.4.1"
+ENV FS_LICENSE=/license.txt
+COPY deps/freesurfer_ubuntu22-7.4.1_amd64.deb freesurfer_ubuntu22-7.4.1_amd64.deb
+# RUN wget --no-verbose --show-progress --progress=bar:force:noscroll \
+#   https://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/7.4.1/freesurfer_ubuntu22-7.4.1_amd64.deb \
+RUN DEBIAN_FRONTEND=noninteractive apt install -y ./freesurfer_ubuntu22-7.4.1_amd64.deb \
+  && rm freesurfer_ubuntu22-7.4.1_amd64.deb
 
 # Install Miniforge3 (a conda installer)
-ENV PATH="/opt/conda/bin:$PATH"
+ENV PATH="/gonzo/conda/bin:$PATH"
 ENV FS_LICENSE=/license.txt
-RUN wget https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-x86_64.sh -O /tmp/Miniforge3.sh && \
-    bash /tmp/Miniforge3.sh -b -p /opt/conda && \
-    rm /tmp/Miniforge3.sh && \
-    /opt/conda/bin/conda update -n base -c conda-forge -y conda \
-    && chown -R nonroot:nonroot /opt/conda
+COPY deps/Miniforge3-Linux-x86_64.sh Miniforge3.sh
+# RUN wget https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-x86_64.sh -O /tmp/Miniforge3.sh && \
+RUN bash Miniforge3.sh -b -p /gonzo/conda && \
+    rm Miniforge3.sh && \
+    /gonzo/conda/bin/conda update -n base -c conda-forge -y conda
 
-WORKDIR /
-RUN echo '#!/bin/bash --login' > /entrypoint.sh && \
-    echo 'source $FREESURFER_HOME/SetUpFreeSurfer.sh' >> /entrypoint.sh && \
-    echo '. ${FSLDIR}/etc/fslconf/fsl.sh' >> /entrypoint.sh && \
-    echo '. /opt/conda/etc/profile.d/conda.sh' >> /entrypoint.sh && \
-    echo "conda activate gonzo" >> /entrypoint.sh && \
-    echo 'exec "$@"' >> /entrypoint.sh && \
-    chmod +x /entrypoint.sh \
-    && chown nonroot:nonroot /entrypoint.sh
-
-USER nonroot
-WORKDIR /gonzo
+# Install the necesary python dependencies
 COPY environment.yml environment.yml
-RUN /opt/conda/bin/conda env create -n gonzo -f environment.yml && \
-    echo '. /opt/conda/etc/profile.d/conda.sh' >> /home/nonroot/bash.bashrc && \
-    echo 'conda activate gonzo' >> /home/nonroot/bash.bashrc
+RUN /gonzo/conda/bin/conda env create -n gonzo -f environment.yml
 
 # Set the entrypoint to our script
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod a+x /entrypoint.sh 
 ENTRYPOINT ["/entrypoint.sh"]
-SHELL ["conda", "run", "-n", "gonzo", "/bin/bash", "-c"]
-CMD ["conda", "run", "-n", "gonzo", "/bin/bash"]
+
+RUN groupadd -g 1000 nonroot-group && useradd -m -u 1000 -g nonroot-group nonroot \ 
+  && mkdir /matlab && chmod a+w /matlab \
+  && chmod -R a+w /gonzo/FastSurfer
+USER nonroot

@@ -1,2 +1,3 @@
+use-conda: True
 use-singularity: True
 singularity-args: "-B singularity/license.txt:/license.txt"

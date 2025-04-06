@@ -1,15 +1,19 @@
 # Gonzo: Human brain MRI data of CSF-tracer evolution over 72h for data-integrated simulations
 
-This repository documents the processing pipeline for the Gonzo dataset containing dynamic contrast-enhanced MRI-images following intrathecal injection of gadobutrol in a healthy human being.
-The data record is available at (Zenodo-link).
+This repository documents the processing pipeline for the Gonzo dataset
+containing dynamic contrast-enhanced MRI-images following intrathecal injection
+of gadobutrol in a healthy human being. The data record is available at
+(Zenodo-link).
 
-This document describes how to setup and run each step of the processing pipeline. If you are only interested in downloading the data, you can skip ahead to [download the data](#download-the-data).
+This document describes how to setup and run each step of the processing
+pipeline. If you are only interested in downloading the data, you can skip
+ahead to [download the data](#download-the-data).
 
 ## Setup
 
 ### Dependencies
 
-- `FreeSurfer`
+- `FreeSurfer` and/or `FastSurfer`
 - `FSL`
 - `conda/mamba`
 - `greedy` (<https://github.com/pyushkevich/greedy>)
@@ -21,12 +25,23 @@ and conda.
 
 ```bash
 mkdir gonzo
-cd gonzo
-git clone https://github.com/jorgenriseth/gMRI2FEM
-git clone https://github.com/jorgenriseth/gonzo
+git clone --branch stable https://github.com/Deep-MI/FastSurfer.git fastsurfer
+cd fastsurfer
+```
 
-mkdir gonzo/submodules
-ln -s ../../gMRI2FEM gonzo/submodules/gmri2fem
+#### FastSurfer
+
+```bash
+FASTSURFER_HOME=[path to your fastsurfer installation]
+echo "export PYTHONPATH=\"\${PYTHONPATH}:$FASTUSRFER_HOME" > $CONDA_PREFIX/etc/conda/activate.d/activate-fastsurfer.sh
+echo "export PATH=\"$FASTSURFER_HOME:\$PATH\"" >> $CONDA_PREFIX/etc/conda/activate.d/activate-fastsurfer.sh
+```
+
+### Clone the necessary repositories
+
+```bash
+git clone https://github.com/jorgenriseth/gonzo
+cd gonzo
 ```
 
 ### Python-environment
@@ -34,9 +49,19 @@ ln -s ../../gMRI2FEM gonzo/submodules/gmri2fem
 Assuming `conda` is installed, create and activate the environment by running
 
 ```bash
+source $FREESURFER_HOME/SetUpFreeSurfer.sh
 conda env create -n gonzo -f environment.yml
 conda activate gonzo
+echo "export PYTHONPATH=\"\${PYTHONPATH}:$PWD\"" > $CONDA_PREFIX/etc/conda/activate.d/activate-fastsurfer.sh
+echo "export PATH=\"$PWD:\$PATH\"" >> $CONDA_PREFIX/etc/conda/activate.d/activate-fastsurfer.sh
+conda activate gonzo
 ```
+
+**NB:** Make sure you source `SetupFreeSurfer.sh` before activating the `conda` environment. `SetupFreeSurfer` does it's own activation of a python-environment, which would overwrite e.g. the python-path set by your environment.
+
+### Docker
+
+We also provide a docker image with necessary dependencies to run the
 
 ### Singularity
 
@@ -143,5 +168,4 @@ The dataset is split into two main directories,
     It will typically contain the following directories:
   - `freesurfer/sub-01`: Output of Freesurfer's `recon-all` for given subject.
   - `sub-01`: Folder for processed data for the given subject, such as registered images, concentration-estimates meshes and statistics.
-
 Note that the `snakemake`-files in `workflows` specifies workflows by desired outputs, necessary inputs, and shell command to be executed in a relatively easy to read format. Consulting these files might answer several questions regarding the expected structure.

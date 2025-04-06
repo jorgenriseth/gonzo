@@ -4,13 +4,12 @@ from pathlib import Path
 shell.executable("bash")
 
 configfile: "snakeconfig.yaml"
-container: "docker://jorgenriseth/gonzo:v0.1.2"
+container: "docker://jorgenriseth/gonzo:latest"
 
 if DeploymentMethod.APPTAINER in workflow.deployment_settings.deployment_method:
   shell.prefix(
     "set -eo pipefail; "
-    "source /opt/conda/etc/profile.d/conda.sh && "
-    "conda activate gonzo && "
+    " source ./activate.sh && "
   )
 
 wildcard_constraints:
