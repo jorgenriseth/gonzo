@@ -61,7 +61,31 @@ conda activate gonzo
 
 ### Docker
 
-We also provide a docker image with necessary dependencies to run the
+We also provide a docker image with necessary dependencies to run the pipeline. The image can be pulled from Docker hub
+
+```bash
+docker pull jorgenriseth/gonzo:latest
+```
+
+or it can be built from the local Dockerfile by
+
+```bash
+bash docker/download-deps.sh;
+docker build -t jorgenriseth/gonzo -f docker/Dockerfile .
+```
+
+Note that if you want to run the FreeSurfer/FastSurfer commands, you need to download a (free) license file from FreeSurfer web page.
+This needs to be mounted into the root-directory of the container,
+
+```bash
+docker run --rm -it -v [path/to/license.txt]:/license.txt -v $PWD:/gonzo/gonzo jorgenriseth/gonzo bash
+```
+
+and from within the container, run
+
+```bash
+snakemake --use-conda -p 
+```
 
 ### Singularity
 

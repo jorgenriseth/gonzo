@@ -1,12 +1,13 @@
 #!/bin/bash
-source /gonzo/conda/etc/profile.d/conda.sh
+. /gonzo/conda/etc/profile.d/conda.sh
 if [[ -n "$CONDA_DEFAULT_ENV" ]]; then
+  echo $CONDA_DEFAULT_ENV
   CURRENT_ENV=$CONDA_DEFAULT_ENV
   conda deactivate
-  source $FREESURFER_HOME/SetUpFreeSurfer.sh
 else
   CURRENT_ENV=gonzo
-  source ${FREESURFER_HOME}/SetUpFreeSurfer.sh
 fi
+source $FREESURFER_HOME/SetUpFreeSurfer.sh
 conda activate $CURRENT_ENV
 export PATH="$CURRENT_ENV/bin:$PATH"
+export PYTHONPATH="$PYTHONPATH:/gonzo/FastSurfer"

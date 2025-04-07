@@ -1,7 +1,6 @@
 resolution: [32]
 
 use-fastsurfer: True
-fastsurfer-threads: 8
 
 # -- Only used if explicitly requested FreeSurfer, or if not use-fastsurfer --
 FS-pial-contrast: "FLAIR"  

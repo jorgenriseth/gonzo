@@ -10,7 +10,7 @@ rule fastsurfer:
             "mri_processed_data/fastsurfer/{{subject}}/surf/{surf}",
             surf=["lh.pial", "rh.pial", "lh.white", "rh.white"]
         ))
-    threads: 0.25 * workflow.cores
+    threads: 0.5 * workflow.cores
     conda: "../envs/fastsurfer.yml"
     shell:
       "run_fastsurfer.sh"
