@@ -9,7 +9,7 @@ container: "docker://jorgenriseth/gonzo:latest"
 if DeploymentMethod.APPTAINER in workflow.deployment_settings.deployment_method:
   shell.prefix(
     "set -eo pipefail; "
-    " source docker/activate.sh && "
+    " source docker/activate-singularity.sh && "
   )
 
 wildcard_constraints:

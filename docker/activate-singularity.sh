@@ -1,7 +1,6 @@
 #!/bin/bash
 . /gonzo/conda/etc/profile.d/conda.sh
 if [[ -n "$CONDA_DEFAULT_ENV" ]]; then
-  echo $CONDA_DEFAULT_ENV
   CURRENT_ENV=$CONDA_DEFAULT_ENV
   conda deactivate
 else
