@@ -41,6 +41,7 @@ rule mri2fenics:
     " --output {output.hdf}"
     " --femfamily {params.femfamily}"
     " --femdegree {params.femdegree}"
+    r" --subject_regex 'sub-\d{{2}}'"
     " --visualdir $(dirname {output.visual[0]})"
 
 
