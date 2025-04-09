@@ -14,7 +14,7 @@ rule fastsurfer:
     conda: "../envs/fastsurfer.yml"
     shell:
       "run_fastsurfer.sh"
-      " --fs_license $(realpath singularity/license.txt)"
+      " --fs_license $(realpath docker/license.txt)"
       " --t1 $(realpath {input.t1})"
       " --sid {wildcards.subject}"
       " --sd $(realpath -m $(dirname {output[0]})/../..)"

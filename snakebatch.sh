@@ -7,7 +7,7 @@
 #SBATCH --output=logs/%x-%j.txt
 
 module load singularity-ce
-echo $@
 profile=$1
 shift
-snakemake -p --profile $profile $@
+echo "profile: $profile"
+snakemake -p $@ --profile $profile
