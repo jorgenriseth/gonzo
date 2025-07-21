@@ -1,0 +1,10 @@
+Substance,Timedelta (min),Concentration (mg Gd per kg fluid)(mg/kg),Concentration (mmol Gd per liter fluid)
+Plasma,100,0.042,0.0002736808646
+Plasma,220,0.067,0.0004365861411
+Plasma,380,0.238,0.001550858233
+Plasma,525,0.317,0.002065638907
+Plasma,750,0.329,0.002143833439
+Plasma,1230,0.338,0.002202479339
+Plasma,1515,0.197,0.001283693579
+Plasma,2430,0.354,0.002306738716
+Plasma,2860,0.087,0.0005669103624

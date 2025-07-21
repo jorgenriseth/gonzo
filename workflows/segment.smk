@@ -59,3 +59,19 @@ rule orbital_refroi:
     " --segmentation {input.segmentation}"
     " --output {output[1]}"
     " --side 'right'"
+
+rule extended_fs:
+  input:
+    aparc="mri_processed_data/{subject}/segmentations/{subject}_seg-aparc+aseg_refined.nii.gz",
+    wmparc="mri_processed_data/{subject}/segmentations/{subject}_seg-wmparc_refined.nii.gz",
+    t2w="mri_processed_data/{subject}/registered/{subject}_ses-01_T2w_registered.nii.gz",
+  output:
+    "mri_processed_data/{subject}/segmentations/{subject}_seg-extended-fs.nii.gz"
+  shell:
+    "gmri2fem seg extended-fs"
+    " --aparc {input.aparc}"
+    " --t2w {input.t2w}"
+    " --wmparc {input.wmparc}"
+    " --output {output}"
+
+

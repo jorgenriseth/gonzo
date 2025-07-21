@@ -46,10 +46,11 @@ rule generate_mesh:
 
 rule mesh_segmentation:
   input:
-    seg="mri_processed_data/fastsurfer/{subject}/mri/aparc+aseg.mgz",
+    seg="mri_processed_data/fastsurfer/{subject}/mri/{seg}.mgz",
     mesh="mri_processed_data/{subject}/modeling/resolution{res}/mesh.hdf",
   output:
-    "mri_processed_data/{subject}/modeling/resolution{res}/mesh_aparc.hdf"
+    "mri_processed_data/{subject}/modeling/resolution{res}/mesh_{seg}.hdf"
   shell:
     "gmri2fem i2m subdomains"
     " {input} {output}"
+

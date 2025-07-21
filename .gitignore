@@ -2,7 +2,9 @@ deps
 build-record/*.zip
 .snakemake
 .sandbox_env
-mri_dataset
+mri_dataset/*
+!mri_dataset/timetable.tsv
+!mri_dataset/blood_concentrations.csv
 mri_processed_data
 figures
 notebooks/*

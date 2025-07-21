@@ -23,11 +23,76 @@ Either consult their web-pages or see the `%post`-section in
 `singularity/gonzo.def` for instructions on how to install FreeSurfer, greedy
 and conda.
 
+### Install conda environment
+
 ```bash
-mkdir gonzo
-git clone --branch stable https://github.com/Deep-MI/FastSurfer.git fastsurfer
-cd fastsurfer
+conda env create -n gonzo -f envs/gonzo.yml
 ```
+
+### Download the data
+
+Information regarding the organization of the data may be found together with the data record at: <https://zenodo.org/uploads/14266867>.
+The script `scripts/zenodo_download.py` uses the Zenodo REST API to list and/or download all or specific files.
+It requires `pydantic_settings` which is installable through pip.
+To download the data, create an `.env`-file in the root directory of this repository with the following content:
+
+```bash
+ACCESS_TOKEN=[Your Zenodo API Token]
+API_URL="https://zenodo.org/api/deposit/depositions/14266867"
+```
+
+Note that the Zenodo API token wil not be needed once the record is made public, and can be left empty.
+Once the `.env`-file have been created, you can list or download the data files by:
+
+```bash
+# List all available files in the repo
+python scripts/zenodo_download.py --list
+
+# Download  all files into the directory 'outputdir'
+python scripts/zenodo_download.py --all  --output outputdir
+
+# Download only the file "README.md" into the current directory
+python scripts/zenodo_download.py --filename README.md --output .
+```
+
+### Run pipeline
+
+The recommended way to run the pipeline is using singularity:. Necessary preparation:
+
+- Download the sourcedata, and unpack into the expected location in `mri_dataset`:
+
+  ```bash
+  python scripts/zenodo_download.py --filename mri-dataset.zip --output /tmp &&
+  unzip -o /tmp/mri-dataset.zip -d .
+  ```
+
+- Acquire a FreeSurfer license from (<https://surfer.nmr.mgh.harvard.edu/fswiki/License>), and move the license-file into `$FREESURFER_HOME/license.txt`, (or into `./docker/license.txt if you're using singularity.).
+
+Assuming that the sourcedata from `mri_dataset.zip` has been downloaded and unopacked, the following command will run the entire pipeline, in a singularity container, using conda
+
+```bash
+snakemake --cores 'all' --profile snakeprofiles/local
+```
+
+If you rather want to install all dependencies locally, and run the pipeline without using singularity,
+
+```bash
+snakemake --cores 'all' --use-conda
+```
+
+### Noise-estimation
+
+Several scripts for investigating the effect of noise on $T_1$-estimates for both the Look-Locker and the mixed IR/SE sequence are available in `scripts/mri_noise_analysis`. Change to that directory and run the scripts from command line. To see possible command line arguments, run e.g.
+
+```bash
+python plot_noise_combined.py --help
+```
+
+The image included in the article was created by using the default arguments.
+
+## Archive below
+
+---
 
 #### FastSurfer
 
@@ -84,7 +149,7 @@ docker run --rm -it -v [path/to/license.txt]:/license.txt -v $PWD:/gonzo/gonzo j
 and from within the container, run
 
 ```bash
-snakemake --use-conda -p 
+snakemake --use-conda -p
 ```
 
 ### Singularity
@@ -127,7 +192,7 @@ Once the `.env`-file have been created, you can list or download the data files 
 
 ```bash
 # List all available files in the repo
-python scripts/zenodo_download.py --list 
+python scripts/zenodo_download.py --list
 
 # Download  all files into the directory 'outputdir'
 python scripts/zenodo_download.py --all  --output outputdir
@@ -141,7 +206,7 @@ To download only and unpack only the data, such that you may run the entire pipe
 
 ```bash
 python scripts/zenodo_download.py --filename mri-dataset.zip --output /tmp &&
-unzip -o /tmp/mri-dataset.zip -d . 
+unzip -o /tmp/mri-dataset.zip -d .
 ```
 
 ### Run `snakemake`
@@ -151,14 +216,6 @@ pixi run snakemake data.vtk [--dry-run]  # Recommend dry-run first to see the li
 ```
 
 NB: If you have already activated the environment using `pixi shell`, you can drop `pixi run` from this command.
-
-### Noise-estimation
-
-Several scripts for investigating the effect of noise on $T_1$-estimates for both the Look-Locker and the mixed IR/SE sequence are available in `scripts/mri_noise_analysis`. Change to that directory and run the scripts from command line. To see possible command line arguments, run e.g.
-
-```bash
-python plot_noise_combined.py --help
-```
 
 ### `snakeconfig`
 
@@ -179,17 +236,19 @@ The dataset is split into two main directories,
 
 - #### `mri_dataset`
 
-    The `mri_dataset` follows a BIDS-like structure and should contain the following directories
+  The `mri_dataset` follows a BIDS-like structure and should contain the following directories
+
   - `sub-01`: MRI-data converted from DICOM-format to Nifti. For further details on the conversion see `notebooks/Gonzo-DICOM-extraction.ipynb`.
     - Organized according to:
-            `sub-01/ses-[XX]/[anat|dti|mixed]/sub-01_ses-[XX]_ADDITIONALINFO.nii.gz`.
+      `sub-01/ses-[XX]/[anat|dti|mixed]/sub-01_ses-[XX]_ADDITIONALINFO.nii.gz`.
     - All MRI-images comes with a "sidecar"-file in `json`-format providing additional information in the same directory as the image.
   - `derivatives/sub-01`: Contains MRI-data directly derived from the Niftii-files in the subject folders, such as T1-maps derived from LookLocker using NordicICE, or from Mixed-sequences using the provided code. Also contains a table with sequence acquisition times in seconds, relative to injection_time.
 
 - ### `mri_processed_data`
 
-    The `mri_processed_data`-folder contains information and data which are not organized according to the `BIDS`-format, either due to incompatibility of software, or if another organization greatly simplifies processing.
-    It will typically contain the following directories:
+      The `mri_processed_data`-folder contains information and data which are not organized according to the `BIDS`-format, either due to incompatibility of software, or if another organization greatly simplifies processing.
+      It will typically contain the following directories:
+
   - `freesurfer/sub-01`: Output of Freesurfer's `recon-all` for given subject.
   - `sub-01`: Folder for processed data for the given subject, such as registered images, concentration-estimates meshes and statistics.
-Note that the `snakemake`-files in `workflows` specifies workflows by desired outputs, necessary inputs, and shell command to be executed in a relatively easy to read format. Consulting these files might answer several questions regarding the expected structure.
+    Note that the `snakemake`-files in `workflows` specifies workflows by desired outputs, necessary inputs, and shell command to be executed in a relatively easy to read format. Consulting these files might answer several questions regarding the expected structure.

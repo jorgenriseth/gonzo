@@ -60,7 +60,8 @@ RUN /gonzo/conda/bin/conda env create -n gonzo -f gonzo.yml \
 ENV PATH="/gonzo/FastSurfer:$PATH"
 ENV PYTHONPATH="$PYTHONPATH:/gonzo/FastSurfer"
 RUN git clone --branch stable https://github.com/Deep-MI/FastSurfer.git \
-  && chmod -R a+w /gonzo/FastSurfer
+  && chmod -R a+rwx /gonzo/FastSurfer \
+  && /gonzo/conda/envs/fastsurfer/bin/python3 /gonzo/FastSurfer/FastSurferCNN/download_checkpoints.py --all
 
 
 # Set the entrypoint to our script

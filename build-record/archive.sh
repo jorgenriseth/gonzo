@@ -66,5 +66,6 @@ zip -rv build-record/surfaces.zip \
 
 zip -rv build-record/mesh-data.zip \
   mri_processed_data/sub-01/modeling/resolution32/data.vtu \
+  mri_processed_data/sub-01/modeling/resolution32/data.vtk \
   mri_processed_data/sub-01/modeling/resolution32/data.hdf \
   mri_processed_data/sub-01/modeling/resolution32/mesh_xdmfs/{mesh,subdomains,boundaries}.{xdmf,h5}
