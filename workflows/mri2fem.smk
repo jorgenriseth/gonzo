@@ -3,7 +3,7 @@ rule collect:
     mesh="mri_processed_data/{subject}/modeling/resolution{res}/mesh.hdf",
     dti="mri_processed_data/{subject}/modeling/resolution{res}/dti.hdf",
     concentration="mri_processed_data/{subject}/modeling/resolution{res}/concentrations.hdf",
-    parcellations="mri_processed_data/{subject}/modeling/resolution{res}/mesh_aparc.hdf"
+    parcellations="mri_processed_data/{subject}/modeling/resolution{res}/mesh_aparc+aseg.hdf"
   output:
     "mri_processed_data/{subject}/modeling/resolution{res}/data.hdf"
   shell:
@@ -63,7 +63,7 @@ rule dti2fenics:
     " --mask {input.mask}"
     " --output {output.hdf}"
 
-rule hdf2vtk:
+rule hdf2vtu:
     input:
         "mri_processed_data/{subject}/modeling/resolution{res}/data.hdf"
     output:
@@ -74,6 +74,15 @@ rule hdf2vtk:
         " --output {output}"
         " --ascii"
 
+rule hdf2vtk:
+    input:
+        "mri_processed_data/{subject}/modeling/resolution{res}/data.hdf"
+    output:
+        "mri_processed_data/{subject}/modeling/resolution{res}/data.vtk"
+    shell:
+        "gmri2fem i2m hdf2vtk"
+        " --input {input}"
+        " --output {output}"
 
 
 

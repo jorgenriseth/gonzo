@@ -11,7 +11,8 @@ zip -rv build-record/mri-dataset.zip \
   mri_dataset/sub-01/ses-01/anat/sub-01_ses-01_FLAIR{.nii.gz,.json} \
   mri_dataset/sub-01/ses-01/dwi/sub-01_ses-01_acq-multiband_sense_dir-AP_DTI{.nii.gz,.bval,.bvec,.json,_ADC.nii.gz} \
   mri_dataset/sub-01/ses-01/dwi/sub-01_ses-01_acq-multiband_sense_dir-PA_b0{.nii.gz,.bval,.bvec,.json} \
-  mri_dataset/timetable.tsv
+  mri_dataset/timetable.tsv \
+  mri_dataset/blood_concentrations.csv
 
 zip -rv build-record/pre-contrast-only.zip \
   mri_dataset/sub-01/ses-01/anat/sub-01_ses-01_T1w{.nii.gz,.json} \
@@ -21,7 +22,8 @@ zip -rv build-record/pre-contrast-only.zip \
   mri_dataset/sub-01/ses-01/anat/sub-01_ses-01_FLAIR{.nii.gz,.json} \
   mri_dataset/sub-01/ses-01/dwi/sub-01_ses-01_acq-multiband_sense_dir-AP_DTI{.nii.gz,.bval,.bvec,.json,_ADC.nii.gz} \
   mri_dataset/sub-01/ses-01/dwi/sub-01_ses-01_acq-multiband_sense_dir-PA_b0{.nii.gz,.bval,.bvec,.json} \
-  mri_dataset/timetable.tsv
+  mri_dataset/timetable.tsv \
+  mri_dataset/blood_concentrations.csv
 
 zip -rv build-record/freesurfer.zip \
   mri_processed_data/freesurfer/sub-01/ \
@@ -66,5 +68,6 @@ zip -rv build-record/surfaces.zip \
 
 zip -rv build-record/mesh-data.zip \
   mri_processed_data/sub-01/modeling/resolution32/data.vtu \
+  mri_processed_data/sub-01/modeling/resolution32/data.vtk \
   mri_processed_data/sub-01/modeling/resolution32/data.hdf \
   mri_processed_data/sub-01/modeling/resolution32/mesh_xdmfs/{mesh,subdomains,boundaries}.{xdmf,h5}
