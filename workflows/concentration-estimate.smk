@@ -5,10 +5,12 @@ rule concentration_estimate:
     mask="mri_processed_data/{subject}/segmentations/{subject}_seg-intracranial_binary.nii.gz"
   output:
     "mri_processed_data/{subject}/concentrations/{subject}_{session}_concentration.nii.gz"
+  params:
+    r1=0.0032
   shell:
     "gmri2fem mri concentration"
     " --input {input.image}"
     " --reference {input.reference}"
     " --output {output}"
-    " --r1 0.0045"
+    " --r1 {params.r1}"
     " --mask {input.mask}"

@@ -3,7 +3,7 @@ rule collect:
     mesh="mri_processed_data/{subject}/modeling/resolution{res}/mesh.hdf",
     dti="mri_processed_data/{subject}/modeling/resolution{res}/dti.hdf",
     concentration="mri_processed_data/{subject}/modeling/resolution{res}/concentrations.hdf",
-    parcellations="mri_processed_data/{subject}/modeling/resolution{res}/mesh_aparc.hdf"
+    parcellations="mri_processed_data/{subject}/modeling/resolution{res}/mesh_aparc+aseg.hdf"
   output:
     "mri_processed_data/{subject}/modeling/resolution{res}/data.hdf"
   shell:
