@@ -1,4 +1,4 @@
-subject	session	sequence_name	acquisition_relative_injection
+subject	session	sequence_label	acquisition_relative_injection
 sub-01	ses-01	FLAIR	-7482.43
 sub-01	ses-01	T1w	-9646.77
 sub-01	ses-02	T1w	15452.85
