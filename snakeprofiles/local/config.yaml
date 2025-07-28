@@ -1,3 +1,6 @@
-use-conda: True
+use-conda: False
 use-singularity: True
-singularity-args: "-B docker/license.txt:/license.txt"
+rerun-incomplete: True
+resources:
+  mem_mb: 60000
+

@@ -33,7 +33,9 @@ rule reference_image:
 
 
 rule register:
-  threads: workflow.cores  # Use all available threads to avoid memory issues when running multiple simoultaneously
+  resources:
+    mem_mb=20000
+  threads: workflow.cores  # Use all available threads to avoid memory issues when running multiple simultaneously
   params:
     metric="NCC 5x5x5"
   shell:

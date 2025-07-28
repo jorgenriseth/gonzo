@@ -1,20 +1,33 @@
 import argparse
+import dataclasses
+import os
 import requests
-from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
-    api_url: str
-    access_token: str
+@dataclasses.dataclass
+class Settings:
+    api_url: str = "https://zenodo.org/api/deposit/depositions/14266867"
+    access_token: str = os.environ.get("ZENODO_ACCESS_TOKEN") or ""
 
 
 def get_file_list(settings: Settings) -> list[dict[str, str]]:
+    if settings.access_token:
+        params = {"access_token": settings.access_token}
+    else:
+        params = {}
+
     r = requests.get(
         f"{settings.api_url}/files",
-        params={"access_token": settings.access_token},
+        params=params,
     )
-    r.raise_for_status()
+    try:
+        r.raise_for_status()
+    except requests.HTTPError as e:
+        print("-" * 40)
+        print("requires ZENODO_ACCESS_TOKEN, if dataset is not public")
+        print("-" * 40)
+        raise e
+
     return r.json()
 
 
@@ -53,9 +66,6 @@ def validate_input(parser):
         parser.error("'--filename' option required without '--list' or '--all'")
     return args
 
-    
-
-
 
 def main():
     parser = argparse.ArgumentParser(description="Download files.")
@@ -86,18 +96,21 @@ def main():
     files = get_file_list(settings)
     if args.ls:
         list_all_files(files)
-        return 
-    
+        return
+
     if not args.all:
         if args.filename is None:
             parser.error("'--filename' option required without '--list' or '--all'")
         files = [file for file in files if file["filename"] == args.filename]
         if len(files) == 0:
             raise ValueError(f"Couldn't find {args.filename} in deposition")
-    
+
     for file in files:
         print(f"Downloading file {file['filename']}")
-        download_single_file(file["links"]["download"], f"{args.output}/{file['filename']}", settings)
+        download_single_file(
+            file["links"]["download"], f"{args.output}/{file['filename']}", settings
+        )
+
 
 if __name__ == "__main__":
     main()
