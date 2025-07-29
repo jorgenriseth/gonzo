@@ -14,7 +14,7 @@ zip -rv build-record/mri-dataset.zip \
   mri_dataset/timetable.tsv \
   mri_dataset/blood_concentrations.csv
 
-zip -rv build-record/pre-contrast-only.zip \
+zip -rv build-record/mri-dataset-precontrast-only.zip \
   mri_dataset/sub-01/ses-01/anat/sub-01_ses-01_T1w{.nii.gz,.json} \
   mri_dataset/sub-01/ses-01/anat/sub-01_ses-01_acq-looklocker_IRT1{.nii.gz,.json,_trigger_times.txt} \
   mri_dataset/sub-01/ses-01/mixed/sub-01_ses-01_acq-mixed{_SE-modulus.nii.gz,_T1map_scanner.nii.gz,_IR-corrected-real.nii.gz,.json,_meta.json} \
@@ -26,7 +26,9 @@ zip -rv build-record/pre-contrast-only.zip \
   mri_dataset/blood_concentrations.csv
 
 zip -rv build-record/freesurfer.zip \
-  mri_processed_data/freesurfer/sub-01/ \
+  mri_processed_data/freesurfer/sub-01/
+
+zip -rv build-record/fastsurfer.zip \
   mri_processed_data/fastsurfer/sub-01/
 
 zip -rv build-record/mri-processed.zip \
