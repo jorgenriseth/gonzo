@@ -35,9 +35,9 @@ rule reference_image:
 rule register:
   resources:
     mem_mb=20000
-  threads: workflow.cores  # Use all available threads to avoid memory issues when running multiple simultaneously
   params:
     metric="NCC 5x5x5"
+  threads: 6
   shell:
     "greedy -d 3 -a" 
     " -i {input.fixed} {input.moving}"
@@ -185,6 +185,8 @@ rule reslice_dti:
     [f"mri_processed_data/{{subject}}/registered/{{subject}}_ses-01_dDTI_V{idx}_registered.nii.gz" for idx in range(1, 4)],
     [f"mri_processed_data/{{subject}}/registered/{{subject}}_ses-01_dDTI_L{idx}_registered.nii.gz" for idx in range(1, 4)],
   threads: 4
+  params:
+    interp_mode="NN"
   shell:
       "gmri2fem dti reslice-dti"
       " --fixed {input.fixed}"
@@ -194,4 +196,5 @@ rule reslice_dti:
       " --transform {input.transform}"
       " --threads {threads}"
       " --suffix _registered"
-      " --greedyargs '-ri NN'"
+      " --interp_mode {params.interp_mode}"
+
