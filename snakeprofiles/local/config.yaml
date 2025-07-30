@@ -1,6 +1,0 @@
-use-conda: False
-use-singularity: True
-rerun-incomplete: True
-resources:
-  mem_mb: 60000
-

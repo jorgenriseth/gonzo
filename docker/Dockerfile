@@ -1,75 +1,49 @@
-# Start with the same base image as the Apptainer definition
-FROM ubuntu:22.04
+FROM ghcr.io/prefix-dev/pixi:latest
 
-# Install dependencies (equivalent to the %post section)
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y \
-    wget \
-    curl \
-    bzip2 \
-    zip \
-    ca-certificates \
-    git \
-    libncurses-dev \
-    libgomp1 \
-    libxml2 \
-    libquadmath0 \
-    vim \ 
-    python3 \
-    tcsh xxd build-essential gfortran \
-    libblas-dev liblapack-dev zlib1g-dev \ 
-    libxmu-dev libxmu-headers libxi-dev libxt-dev libx11-dev libglu1-mesa-dev
+    wget
 
-WORKDIR /gonzo
-
-# Download and install FSL
-ENV FSLDIR=/gonzo/fsl
-COPY deps/fslinstaller.py fslinstaller.py
-RUN python3 fslinstaller.py -d /gonzo/fsl && \
-    rm fslinstaller.py
-
-# Download and install freesurfer. Remove installer afterwards to reduce image.
-ENV FREESURFER_HOME="/usr/local/freesurfer/7.4.1"
-ENV FS_LICENSE=/license.txt
-COPY ./deps/freesurfer_ubuntu22-7.4.1_amd64.deb freesurfer_ubuntu22-7.4.1_amd64.deb
-RUN DEBIAN_FRONTEND=noninteractive apt install -y ./freesurfer_ubuntu22-7.4.1_amd64.deb \
-  && rm freesurfer_ubuntu22-7.4.1_amd64.deb \
-  && rm -rf /var/lib/apt/lists/*
-
-
-# Install Miniforge3 (a conda installer)
-ENV PATH="/gonzo/conda/bin:$PATH"
-ENV FS_LICENSE=/license.txt
-COPY deps/Miniforge3-Linux-x86_64.sh Miniforge3.sh
-RUN bash Miniforge3.sh -b -p /gonzo/conda && \
-    rm Miniforge3.sh && \
-    /gonzo/conda/bin/conda update -n base -c conda-forge -y conda
-
-
-ENV PATH="/gonzo/greedy-1.3.0-alpha-Linux-gcc64/bin:$PATH"
-COPY deps/greedy.tar.gz greedy.tar.gz
-RUN tar xvfz greedy.tar.gz \
+WORKDIR /opt
+ENV PATH="/opt/greedy-1.3.0-alpha-Linux-gcc64/bin:$PATH"
+RUN  wget https://sourceforge.net/projects/greedy-reg/files/Nightly/greedy-nightly-Linux-gcc64.tar.gz/download -O /opt/greedy.tar.gz \ 
+  && tar xvfz greedy.tar.gz \
   && rm greedy.tar.gz
 
-# Install the necesary python dependencies
-COPY envs/gonzo.yml gonzo.yml
-COPY envs/fastsurfer.yml fastsurfer.yml
-RUN /gonzo/conda/bin/conda env create -n gonzo -f gonzo.yml \
-  && /gonzo/conda/bin/conda env create -n fastsurfer -f fastsurfer.yml 
 
-ENV PATH="/gonzo/FastSurfer:$PATH"
-ENV PYTHONPATH="$PYTHONPATH:/gonzo/FastSurfer"
-RUN git clone --branch stable https://github.com/Deep-MI/FastSurfer.git \
-  && chmod -R a+rwx /gonzo/FastSurfer \
-  && /gonzo/conda/envs/fastsurfer/bin/python3 /gonzo/FastSurfer/FastSurferCNN/download_checkpoints.py --all
+# WORKDIR /
+# COPY gmri2fem /gmri2fem
 
+# NOTE: This command assumes your local pixi.lock is up-to-date.
+# Before building, run `pixi install` locally to sync your lock file.
+WORKDIR /gonzo
+COPY pyproject.toml pixi.lock ./
+RUN pixi install --locked
 
-# Set the entrypoint to our script
-COPY docker/entrypoint.sh /entrypoint.sh
-RUN chmod a+x /entrypoint.sh 
-ENTRYPOINT ["/entrypoint.sh"]
+# --- Application Code Layer ---
+# Now, copy the rest of your application source code.
+# Changes to your code from this point on will not require re-installing all the dependencies,
+# making subsequent builds much faster.
+# Note: I've cleaned up the COPY command to be more explicit and removed the duplicate Snakefile.
+COPY Snakefile snakeconfig.yaml ./
+COPY scripts/ ./scripts/
+COPY snakeprofiles/ ./snakeprofiles/
+COPY workflows/ ./workflows/
 
-RUN groupadd -g 1000 nonroot-group && useradd -m -u 1000 -g nonroot-group nonroot \ 
-  && mkdir /matlab && chmod a+w /matlab
+# --- Execution ---
+# Use ENTRYPOINT to make your container act like an executable.
+# This will execute the default task defined in your pyproject.toml.
+ENTRYPOINT [ "pixi", "run" ]
 
-USER nonroot
+#
+# ###
+# COPY pixi.lock pyproject.toml Snakefile snakeconfig.yaml scripts snakeprofiles workflows Snakefile /gonzo/
+#
+# RUN pixi pixi install --locked -e default
+# RUN pixi update && pixi install --locked -e default
+# # RUN pixi shell-hook -s bash > /shell-hook
+# # RUN echo "#!/bin/bash" > /gonzo/entrypoint.sh
+# # RUN cat /shell-hook >> /gonzo/entrypoint.sh
+# # RUN echo 'exec "$@"' >> /gonzo/entrypoint.sh
+#
+# CMD [ "pixi", "run" ]
