@@ -6,6 +6,7 @@
 #SBATCH --cpus-per-task=1
 #SBATCH --output=logs/%x-%j.txt
 
+mkdir -p jobs logs
 module load singularity-ce
 profile=$1
 shift
