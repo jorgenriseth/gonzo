@@ -1,0 +1,7 @@
+rerun-incomplete: True
+default-resources:
+  mem_mb: 60000
+set-threads:
+  fastsurfer: 6
+  freesurfer: 6
+

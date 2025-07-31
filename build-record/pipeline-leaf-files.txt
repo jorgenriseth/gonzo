@@ -12,6 +12,7 @@ mri_processed_data/sub-01/registered/sub-01_ses-03_T1w_registered.nii.gz
 mri_processed_data/sub-01/registered/sub-01_ses-04_T1w_registered.nii.gz
 mri_processed_data/sub-01/registered/sub-01_ses-05_T1w_registered.nii.gz
 mri_processed_data/sub-01/registered/sub-01_ses-01_T2w_registered.nii.gz
+mri_processed_data/sub-01/registered/sub-01_ses-01_FLAIR_registered.nii.gz
 mri_processed_data/sub-01/registered/sub-01_ses-01_acq-mixed_T1map_scanner_registered.nii.gz
 mri_processed_data/sub-01/registered/sub-01_ses-02_acq-mixed_T1map_scanner_registered.nii.gz
 mri_processed_data/sub-01/registered/sub-01_ses-03_acq-mixed_T1map_scanner_registered.nii.gz

@@ -44,13 +44,15 @@ apptainer = ">=1.4.1,<2"
 squashfuse = ">=0.6.1,<0.7"
 gocryptfs = ">=2.6.0,<3"
 snakemake-executor-plugin-cluster-generic = ">=1.0.9,<2"
-gmri2fem = ">=0.2.7a,<0.3"
+gmri2fem = ">=0.2.7,<0.3"
 fsl-eddy = ">=2401.2,<2402"
 fsl-topup = ">=2203.5,<2204"
 fsl-fdt = ">=2202.11,<2203"
 fsl-bet2 = ">=2111.8,<2112"
 setuptools = ">=79.0.1,<80"
 vtk = ">=9.4.2,<10"
+notebook = "<7"
+jupyter_server = "<2"
 
 [tool.pixi.pypi-dependencies]
 #gmri2fem = { path = "../gmri2fem/", editable = true }
