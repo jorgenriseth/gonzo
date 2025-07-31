@@ -82,7 +82,7 @@ use rule reslice as reslice_T1w with:
 # FLAIR
 use rule register as register_FLAIR with:
   input:
-    fixed="mri_processed_data/{subject}/registered/{subject}_ses-01_FLAIR_registered.nii.gz",
+    fixed="mri_processed_data/{subject}/registered/{subject}_ses-01_T1w_registered.nii.gz",
     moving="mri_dataset/{subject}/{session}/anat/{subject}_{session}_FLAIR.nii.gz"
   output:
     "mri_processed_data/{subject}/transforms/{subject}_{session}_FLAIR.mat"
@@ -90,7 +90,7 @@ use rule register as register_FLAIR with:
 
 use rule reslice as reslice_FLAIR with:
   input:
-    fixed="mri_processed_data/{subject}/registered/{subject}_ses-01_FLAIR_registered.nii.gz",
+    fixed="mri_processed_data/{subject}/registered/{subject}_ses-01_T1w_registered.nii.gz",
     moving="mri_dataset/{subject}/{session}/anat/{subject}_{session}_FLAIR.nii.gz",
     transform="mri_processed_data/{subject}/transforms/{subject}_{session}_FLAIR.mat"
   output:
