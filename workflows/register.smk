@@ -184,7 +184,7 @@ rule reslice_dti:
     "mri_processed_data/{subject}/registered/{subject}_ses-01_dDTI_FA_registered.nii.gz",
     [f"mri_processed_data/{{subject}}/registered/{{subject}}_ses-01_dDTI_V{idx}_registered.nii.gz" for idx in range(1, 4)],
     [f"mri_processed_data/{{subject}}/registered/{{subject}}_ses-01_dDTI_L{idx}_registered.nii.gz" for idx in range(1, 4)],
-  threads: 4
+  threads: 1 # Unknown reason, but multithread ocattionally hangs in reconstruction when run from snakemake
   params:
     interp_mode="NN"
   shell:
