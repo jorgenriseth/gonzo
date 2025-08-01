@@ -6,6 +6,7 @@ mri_processed_data/fastsurfer/sub-01/mri/aparc+aseg.mgz
 mri_processed_data/fastsurfer/sub-01/mri/wmparc.mgz
 mri_processed_data/sub-01/modeling/resolution32/data.hdf
 mri_processed_data/sub-01/modeling/resolution32/data.vtu
+mri_processed_data/sub-01/modeling/resolution32/data.vtk
 mri_processed_data/sub-01/registered/sub-01_ses-01_T1w_registered.nii.gz
 mri_processed_data/sub-01/registered/sub-01_ses-02_T1w_registered.nii.gz
 mri_processed_data/sub-01/registered/sub-01_ses-03_T1w_registered.nii.gz

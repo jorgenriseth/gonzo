@@ -6,6 +6,7 @@ zip -rv build-record/mri-dataset.zip \
     echo mri_dataset/sub-01/${ses}/anat/sub-01_${ses}_T1w{.nii.gz,.json}
     echo mri_dataset/sub-01/${ses}/anat/sub-01_${ses}_acq-looklocker_IRT1{.nii.gz,.json,_trigger_times.txt}
     echo mri_dataset/sub-01/${ses}/mixed/sub-01_${ses}_acq-mixed{_SE-modulus.nii.gz,_T1map_scanner.nii.gz,_IR-corrected-real.nii.gz,.json,_meta.json}
+    echo mri_dataset/derivatives/sub-01/${ses}/sub-01_${ses}_acq-looklocker_T1map_nICE.nii.gz # Added to mri-dataset, as they require manual work and is not produced by the pipeline
   done) \
   mri_dataset/sub-01/ses-01/anat/sub-01_ses-01_T2w{.nii.gz,.json} \
   mri_dataset/sub-01/ses-01/anat/sub-01_ses-01_FLAIR{.nii.gz,.json} \
