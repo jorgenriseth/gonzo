@@ -53,6 +53,8 @@ setuptools = ">=79.0.1,<80"
 vtk = ">=9.4.2,<10"
 notebook = "<7"
 jupyter_server = "<2"
+seaborn = "*"
+scikit-learn = "*"
 
 [tool.pixi.pypi-dependencies]
 #gmri2fem = { path = "../gmri2fem/", editable = true }
