@@ -40,10 +40,11 @@ zip -rv build-record/mri-processed.zip \
   mri_dataset/derivatives/sub-01/ses-01/dwi/sub-01_ses-01_dDTI_{FA,MD,L{1..3},V{1..3},tensor}.nii.gz \
   mri_processed_data/sub-01/registered/sub-01_ses-0{1..5}_T1w_registered.nii.gz \
   mri_processed_data/sub-01/registered/sub-01_ses-01_T2w_registered.nii.gz \
+  mri_processed_data/sub-01/registered/sub-01_ses-01_FLAIR_registered.nii.gz \
   mri_processed_data/sub-01/registered/sub-01_ses-0{1..5}_acq-looklocker_T1map_registered.nii.gz \
   mri_processed_data/sub-01/registered/sub-01_ses-0{1..5}_acq-mixed_T1map_registered.nii.gz \
   mri_processed_data/sub-01/registered/sub-01_ses-0{1..5}_acq-mixed_T1map_scanner_registered.nii.gz \
-  mri_processed_data/sub-01/transforms/sub-01_ses-0{1..5}_T1w.mat \
+  mri_processed_data/sub-01/transforms/sub-01_ses-0{2..5}_T1w.mat \
   mri_processed_data/sub-01/transforms/sub-01_ses-01_T2w.mat \
   mri_processed_data/sub-01/T1w_normalized/sub-01_ses-0{1..5}_T1w_normalized.nii.gz \
   mri_processed_data/sub-01/transforms/sub-01_ses-0{1..5}_acq-looklocker.mat \
