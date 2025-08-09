@@ -33,9 +33,11 @@ rule reference_image:
 
 
 rule register:
-  threads: workflow.cores  # Use all available threads to avoid memory issues when running multiple simoultaneously
+  resources:
+    mem_mb=20000
   params:
     metric="NCC 5x5x5"
+  threads: 6
   shell:
     "greedy -d 3 -a" 
     " -i {input.fixed} {input.moving}"
@@ -80,7 +82,7 @@ use rule reslice as reslice_T1w with:
 # FLAIR
 use rule register as register_FLAIR with:
   input:
-    fixed="mri_processed_data/{subject}/registered/{subject}_ses-01_FLAIR_registered.nii.gz",
+    fixed="mri_processed_data/{subject}/registered/{subject}_ses-01_T1w_registered.nii.gz",
     moving="mri_dataset/{subject}/{session}/anat/{subject}_{session}_FLAIR.nii.gz"
   output:
     "mri_processed_data/{subject}/transforms/{subject}_{session}_FLAIR.mat"
@@ -88,7 +90,7 @@ use rule register as register_FLAIR with:
 
 use rule reslice as reslice_FLAIR with:
   input:
-    fixed="mri_processed_data/{subject}/registered/{subject}_ses-01_FLAIR_registered.nii.gz",
+    fixed="mri_processed_data/{subject}/registered/{subject}_ses-01_T1w_registered.nii.gz",
     moving="mri_dataset/{subject}/{session}/anat/{subject}_{session}_FLAIR.nii.gz",
     transform="mri_processed_data/{subject}/transforms/{subject}_{session}_FLAIR.mat"
   output:
@@ -182,7 +184,9 @@ rule reslice_dti:
     "mri_processed_data/{subject}/registered/{subject}_ses-01_dDTI_FA_registered.nii.gz",
     [f"mri_processed_data/{{subject}}/registered/{{subject}}_ses-01_dDTI_V{idx}_registered.nii.gz" for idx in range(1, 4)],
     [f"mri_processed_data/{{subject}}/registered/{{subject}}_ses-01_dDTI_L{idx}_registered.nii.gz" for idx in range(1, 4)],
-  threads: 4
+  threads: 1 # Unknown reason, but multithread ocattionally hangs in reconstruction when run from snakemake
+  params:
+    interp_mode="NN"
   shell:
       "gmri2fem dti reslice-dti"
       " --fixed {input.fixed}"
@@ -192,4 +196,5 @@ rule reslice_dti:
       " --transform {input.transform}"
       " --threads {threads}"
       " --suffix _registered"
-      " --greedyargs '-ri NN'"
+      " --interp_mode {params.interp_mode}"
+

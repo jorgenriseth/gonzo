@@ -4,13 +4,15 @@ from pathlib import Path
 shell.executable("bash")
 
 configfile: "snakeconfig.yaml"
-container: "docker://jorgenriseth/gonzo:latest"
+container: "gonzo-pixi.sif"
+#container: "docker://jorgenriseth/gonzo:latest"
 
 if DeploymentMethod.APPTAINER in workflow.deployment_settings.deployment_method:
   shell.prefix(
     "set -eo pipefail; "
-    " source docker/activate-singularity.sh && "
+    " pixi run bash -c \""
   )
+  shell.suffix("\"")
 
 wildcard_constraints:
   session = r"ses-\d{2}",

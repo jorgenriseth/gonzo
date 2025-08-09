@@ -6,6 +6,7 @@ zip -rv build-record/mri-dataset.zip \
     echo mri_dataset/sub-01/${ses}/anat/sub-01_${ses}_T1w{.nii.gz,.json}
     echo mri_dataset/sub-01/${ses}/anat/sub-01_${ses}_acq-looklocker_IRT1{.nii.gz,.json,_trigger_times.txt}
     echo mri_dataset/sub-01/${ses}/mixed/sub-01_${ses}_acq-mixed{_SE-modulus.nii.gz,_T1map_scanner.nii.gz,_IR-corrected-real.nii.gz,.json,_meta.json}
+    echo mri_dataset/derivatives/sub-01/${ses}/sub-01_${ses}_acq-looklocker_T1map_nICE.nii.gz # Added to mri-dataset, as they require manual work and is not produced by the pipeline
   done) \
   mri_dataset/sub-01/ses-01/anat/sub-01_ses-01_T2w{.nii.gz,.json} \
   mri_dataset/sub-01/ses-01/anat/sub-01_ses-01_FLAIR{.nii.gz,.json} \
@@ -14,7 +15,7 @@ zip -rv build-record/mri-dataset.zip \
   mri_dataset/timetable.tsv \
   mri_dataset/blood_concentrations.csv
 
-zip -rv build-record/pre-contrast-only.zip \
+zip -rv build-record/mri-dataset-precontrast-only.zip \
   mri_dataset/sub-01/ses-01/anat/sub-01_ses-01_T1w{.nii.gz,.json} \
   mri_dataset/sub-01/ses-01/anat/sub-01_ses-01_acq-looklocker_IRT1{.nii.gz,.json,_trigger_times.txt} \
   mri_dataset/sub-01/ses-01/mixed/sub-01_ses-01_acq-mixed{_SE-modulus.nii.gz,_T1map_scanner.nii.gz,_IR-corrected-real.nii.gz,.json,_meta.json} \
@@ -26,7 +27,9 @@ zip -rv build-record/pre-contrast-only.zip \
   mri_dataset/blood_concentrations.csv
 
 zip -rv build-record/freesurfer.zip \
-  mri_processed_data/freesurfer/sub-01/ \
+  mri_processed_data/freesurfer/sub-01/
+
+zip -rv build-record/fastsurfer.zip \
   mri_processed_data/fastsurfer/sub-01/
 
 zip -rv build-record/mri-processed.zip \
@@ -37,10 +40,11 @@ zip -rv build-record/mri-processed.zip \
   mri_dataset/derivatives/sub-01/ses-01/dwi/sub-01_ses-01_dDTI_{FA,MD,L{1..3},V{1..3},tensor}.nii.gz \
   mri_processed_data/sub-01/registered/sub-01_ses-0{1..5}_T1w_registered.nii.gz \
   mri_processed_data/sub-01/registered/sub-01_ses-01_T2w_registered.nii.gz \
+  mri_processed_data/sub-01/registered/sub-01_ses-01_FLAIR_registered.nii.gz \
   mri_processed_data/sub-01/registered/sub-01_ses-0{1..5}_acq-looklocker_T1map_registered.nii.gz \
   mri_processed_data/sub-01/registered/sub-01_ses-0{1..5}_acq-mixed_T1map_registered.nii.gz \
   mri_processed_data/sub-01/registered/sub-01_ses-0{1..5}_acq-mixed_T1map_scanner_registered.nii.gz \
-  mri_processed_data/sub-01/transforms/sub-01_ses-0{1..5}_T1w.mat \
+  mri_processed_data/sub-01/transforms/sub-01_ses-0{2..5}_T1w.mat \
   mri_processed_data/sub-01/transforms/sub-01_ses-01_T2w.mat \
   mri_processed_data/sub-01/T1w_normalized/sub-01_ses-0{1..5}_T1w_normalized.nii.gz \
   mri_processed_data/sub-01/transforms/sub-01_ses-0{1..5}_acq-looklocker.mat \

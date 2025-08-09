@@ -8,6 +8,7 @@ rule segment_refinements:
     csf_segmentation="mri_processed_data/{subject}/segmentations/{subject}_seg-csf-{seg}.nii.gz",
   params:
     label_smoothing = 1.0
+  threads: 6
   shell:
     "gmri2fem seg refine"
     " --fs_seg {input.segmentation}"
@@ -48,17 +49,18 @@ rule orbital_refroi:
   output:
     "mri_processed_data/{subject}/segmentations/{subject}_seg-refroi-left-orbital_binary.nii.gz",
     "mri_processed_data/{subject}/segmentations/{subject}_seg-refroi-right-orbital_binary.nii.gz",
+  params: inputdir = lambda wc: f"mri_processed_data/{wc.subject}/registered"
   shell:
     "gmri2fem seg orbital-refroi"
-    " --T1w_dir $(dirname '{input.T1w[0]}')"
-    " --segmentation {input.segmentation}"
-    " --output {output[0]}"
-    " --side 'left' && "
+    " --T1w_dir '{params.inputdir}'"
+    " --segmentation '{input.segmentation}'"
+    " --output '{output[0]}'"
+    " --side \"left\" && "
     "gmri2fem seg orbital-refroi"
-    " --T1w_dir $(dirname '{input.T1w[0]}')"
+    " --T1w_dir {params.inputdir}"
     " --segmentation {input.segmentation}"
     " --output {output[1]}"
-    " --side 'right'"
+    " --side \"right\""
 
 rule extended_fs:
   input:
