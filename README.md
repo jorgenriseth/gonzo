@@ -148,7 +148,3 @@ python scripts/zenodo_download.py --all  --output outputdir
 # Download only the file "README.md" into the current directory
 python scripts/zenodo_download.py --filename README.md --output .
 ```
-
-```
-
-```
