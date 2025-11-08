@@ -9,7 +9,34 @@ This document describes how to setup and run each step of the processing
 pipeline. If you are only interested in downloading the data, you can skip
 ahead to [download the data](#download-the-data).
 
+<<<<<<< HEAD
 ## Install dependencies
+=======
+## Run pipeline
+
+```bash
+sudo apt-get update
+sudo apt-get install -y software-properties-common \
+add-apt-repository -y ppa:apptainer/ppa
+sudo apt-get update # Rerun after added repository
+sudo apt-get install -y \
+  wget \
+  fuse2fs \
+  squashfuse \
+  gocryptfs \
+  apptainer-suid \
+
+curl -fsSL https://pixi.sh/install.sh | sh
+```
+
+The pipeline relies heavily on both python and non-python dependencies. The main components are
+
+- `FreeSurfer` and/or `FastSurfer`: The current pipeline runs scripts which leverages the official docker containers, but the surface reconstruction and MRI segmentation may alternatively be run with a local installation of FreeSurfer/FastSurfer. See their official web pages for installation instructions, and confer with `scripts/freesurfer.py` or `scripts/fastsurfer.py` for details on how to run them in current pipeline.
+- `FSL` - Only a subset of the commands are necessary. These are available through conda by adding the FSL conda channel (see pyproject.toml for link.)
+- `greedy` (<https://github.com/pyushkevich/greedy>) - Image registration. `greedy` may be memory hungry, so for computers with limited resources, you might have to look into alternatives like
+- `gmri2fem`: (<https://github.com/jorgenriseth/gMRI2FEM>)
+- `fuse2fs`: `sudo apt-get install fuse2fs`
+>>>>>>> 6290920 (updated dependency description in README)
 
 ```bash
 sudo apt-get update
@@ -24,12 +51,16 @@ sudo apt-get install -y \
   apptainer-suid 
 ```
 
+<<<<<<< HEAD
 The pipeline relies heavily on both python and non-python dependencies. Moreover,
 some necessary python packages are only available through `conda`, whereas
 others are only available through `PyPI`.
 
 To manage python dependencies, we recommend using the `pixi` package manager.
 Instructions for `conda` are listed below.
+=======
+The pipeline may be run by relying on the `pixi` package manager and singularity using the instructions below.
+>>>>>>> 6290920 (updated dependency description in README)
 
 - Download the pixi package manager:
 
