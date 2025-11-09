@@ -24,7 +24,9 @@ sudo apt-get install -y \
   apptainer-suid 
 ```
 
-The pipeline relies heavily on both python and non-python dependencies. The main components are
+The pipeline relies heavily on both python and non-python dependencies. Moreover,
+some necessary python packages are only available through `conda`, whereas
+others are only available through `PyPI`.
 
 - `FreeSurfer` and/or `FastSurfer`: The current pipeline runs scripts which leverages the official docker containers, but the surface reconstruction and MRI segmentation may alternatively be run with a local installation of FreeSurfer/FastSurfer. See their official web pages for installation instructions, and confer with `scripts/freesurfer.py` or `scripts/fastsurfer.py` for details on how to run them in current pipeline.
 - `FSL` - Only a subset of the commands are necessary. These are available through conda by adding the FSL conda channel (see pyproject.toml for link.)
