@@ -9,7 +9,7 @@ This document describes how to setup and run each step of the processing
 pipeline. If you are only interested in downloading the data, you can skip
 ahead to [download the data](#download-the-data).
 
-## Run pipeline
+## Install dependencies
 
 ```bash
 sudo apt-get update
@@ -22,8 +22,6 @@ sudo apt-get install -y \
   squashfuse \
   gocryptfs \
   apptainer-suid \
-
-curl -fsSL https://pixi.sh/install.sh | sh
 ```
 
 The pipeline relies heavily on both python and non-python dependencies. The main components are
@@ -75,16 +73,15 @@ The pipeline may be run by relying on the `pixi` package manager and singularity
   unzip -o /tmp/mri-dataset.zip -d .
   ```
 
-  **NB:** Until dataset is public, this require a Zenodo access token, see [download the data](#download-the-data).
-
-- Download the gonzo:pixi container for use with singularity
+- Download the jorgenriseth/gonzo:latest container for use with singularity
 
   ```bash
   mkdir mri_processed_data
   apptainer build gonzo-pixi.sif docker://jorgenriseth/gonzo:pixi
   ```
 
-- Acquire a FreeSurfer license from (<https://surfer.nmr.mgh.harvard.edu/fswiki/License>), and move the license-file into `./docker/license.txt if you're using singularity.).`
+- Acquire a FreeSurfer license from (<https://surfer.nmr.mgh.harvard.edu/fswiki/License>), and move the license-file into `./docker/license.txt` if you're using singularity (yeah, I know the location might be confusing).
+
 - Execute the pipeline
 
   ```bash
@@ -139,4 +136,8 @@ python scripts/zenodo_download.py --all  --output outputdir
 
 # Download only the file "README.md" into the current directory
 python scripts/zenodo_download.py --filename README.md --output .
+```
+
+```
+
 ```
