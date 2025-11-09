@@ -28,33 +28,8 @@ The pipeline relies heavily on both python and non-python dependencies. Moreover
 some necessary python packages are only available through `conda`, whereas
 others are only available through `PyPI`.
 
-- `FreeSurfer` and/or `FastSurfer`: The current pipeline runs scripts which leverages the official docker containers, but the surface reconstruction and MRI segmentation may alternatively be run with a local installation of FreeSurfer/FastSurfer. See their official web pages for installation instructions, and confer with `scripts/freesurfer.py` or `scripts/fastsurfer.py` for details on how to run them in current pipeline.
-- `FSL` - Only a subset of the commands are necessary. These are available through conda by adding the FSL conda channel (see pyproject.toml for link.)
-- `greedy` (<https://github.com/pyushkevich/greedy>) - Image registration. `greedy` may be memory hungry, so for computers with limited resources, you might have to look into alternatives like
-- `gmri2fem`: (<https://github.com/jorgenriseth/gMRI2FEM>)
-- `fuse2fs`: `sudo apt-get install fuse2fs`
-
-**NB:** If you get an error saying:
-```
-ERROR  : Could not write info to setgroups: Permission denied
-ERROR  : Error while waiting event for user namespace mappings: no event received
-```
-it is probably because Ubuntu 23.10 and later versions does not allow creation of unprivileged user namespaces by default. To fix it, follow these instructions found in apptainers INSTALL.md, (https://github.com/apptainer/apptainer/blob/release-1.3/INSTALL.md#apparmor-profile-ubuntu-2310):
-```bash
-sudo tee /etc/apparmor.d/apptainer << EOF
-# Permit unprivileged user namespace creation for apptainer starter
-abi <abi/4.0>,
-include <tunables/global>
-profile apptainer $PWD/.pixi/envs/default/libexec/apptainer/bin/starter{,-suid} 
-    flags=(unconfined) {
-  userns,
-  # Site-specific additions and overrides. See local/README for details.
-  include if exists <local/apptainer>
-}
-EOF
-```
-
-The pipeline may be run by relying on the `pixi` package manager and singularity using the instructions below.
+To manage python dependencies, we recommend using the `pixi` package manager.
+Instructions for `conda` are listed below.
 
 - Download the pixi package manager:
 
@@ -78,7 +53,6 @@ The pipeline may be run by relying on the `pixi` package manager and singularity
 - Download the jorgenriseth/gonzo:latest container for use with singularity
 
   ```bash
-  mkdir mri_processed_data
   apptainer build gonzo-pixi.sif docker://jorgenriseth/gonzo:latest
   ```
 
