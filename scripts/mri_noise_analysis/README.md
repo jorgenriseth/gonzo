@@ -19,3 +19,11 @@ python plot_noise_combined.py
 ```
 
 ![MRI noise estimation](./.doc/mri_noise_ll_mixed_small.png)
+
+The tabulated results can be created with
+
+```
+python tabulate_noise_combined.py --snr 25 --samples 500 --sequence_duration 2.6
+```
+
+corresponding to Table 6-9 in the Gonzo manuscript.
