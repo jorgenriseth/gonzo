@@ -11,40 +11,17 @@ ahead to [download the data](#download-the-data).
 
 ## Install dependencies
 
-**NB:** If you get an error saying:
-
-```
-ERROR  : Could not write info to setgroups: Permission denied
-ERROR  : Error while waiting event for user namespace mappings: no event received
-```
-
-it is probably because Ubuntu 23.10 and later versions does not allow creation of unprivileged user namespaces by default. To fix it, follow these instructions found in apptainers INSTALL.md, (<https://github.com/apptainer/apptainer/blob/release-1.3/INSTALL.md#apparmor-profile-ubuntu-2310>):
-
-```bash
-sudo tee /etc/apparmor.d/apptainer << EOF
-# Permit unprivileged user namespace creation for apptainer starter
-abi <abi/4.0>,
-include <tunables/global>
-profile apptainer $PWD/.pixi/envs/default/libexec/apptainer/bin/starter{,-suid} 
-    flags=(unconfined) {
-  userns,
-  # Site-specific additions and overrides. See local/README for details.
-  include if exists <local/apptainer>
-}
-EOF
-```
-
 ```bash
 sudo apt-get update
-sudo apt-get install -y software-properties-common \
-add-apt-repository -y ppa:apptainer/ppa
+sudo apt-get install -y software-properties-common 
+sudo add-apt-repository -y ppa:apptainer/ppa
 sudo apt-get update # Rerun after added repository
 sudo apt-get install -y \
   wget \
   fuse2fs \
   squashfuse \
   gocryptfs \
-  apptainer-suid \
+  apptainer-suid 
 ```
 
 The pipeline relies heavily on both python and non-python dependencies. Moreover,
@@ -78,7 +55,7 @@ Instructions for `conda` are listed below.
 - Download the jorgenriseth/gonzo:latest container for use with singularity
 
   ```bash
-  apptainer build gonzo-pixi.sif docker://jorgenriseth/gonzo:pixi
+  apptainer build gonzo-pixi.sif docker://jorgenriseth/gonzo:latest
   ```
 
 - Acquire a FreeSurfer license from (<https://surfer.nmr.mgh.harvard.edu/fswiki/License>), and move the license-file into `./docker/license.txt` if you're using singularity (yeah, I know the location might be confusing).
@@ -88,6 +65,17 @@ Instructions for `conda` are listed below.
   ```bash
   snakemake --profile snakeprofiles/local-singularity --cores all -p
   ```
+
+### Troubleshooting
+
+**NB:** If you get an error saying:
+
+```
+ERROR  : Could not write info to setgroups: Permission denied
+ERROR  : Error while waiting event for user namespace mappings: no event received
+```
+
+it is probably because Ubuntu 23.10 and later versions does not allow creation of unprivileged user namespaces by default. To fix it, follow these instructions found in apptainers INSTALL.md, (<https://github.com/apptainer/apptainer/blob/release-1.3/INSTALL.md#apparmor-profile-ubuntu-2310>)
 
 ### Figure creation
 
