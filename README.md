@@ -14,15 +14,15 @@ to [download the data](#download-the-data).
 
 ```bash
 sudo apt-get update
-sudo apt-get install -y software-properties-common \
-add-apt-repository -y ppa:apptainer/ppa
+sudo apt-get install -y software-properties-common 
+sudo add-apt-repository -y ppa:apptainer/ppa
 sudo apt-get update # Rerun after added repository
 sudo apt-get install -y \
   wget \
   fuse2fs \
   squashfuse \
   gocryptfs \
-  apptainer-suid \
+  apptainer-suid 
 ```
 
 The pipeline relies heavily on both python and non-python dependencies. The main
@@ -82,6 +82,7 @@ using the instructions below.
 - Download the jorgenriseth/gonzo:latest container for use with singularity
 
   ```bash
+  mkdir -p mri_processed_data
   apptainer build gonzo-pixi.sif docker://jorgenriseth/gonzo:latest
   ```
 
