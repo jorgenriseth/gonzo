@@ -1,0 +1,47 @@
+# Table of Contents for Gonzo Documentation
+
+format: jb-book
+root: index
+parts:
+  - caption: Getting Started
+    chapters:
+      - file: gonzo-readme-setup
+        title: Setup Guide
+  
+  - caption: Data Extraction and Preprocessing
+    chapters:
+      - file: gonzo-dicom-extraction
+        title: DICOM Extraction
+      - file: free-fast-surfer
+        title: FreeSurfer Processing
+  
+  - caption: T1 Mapping
+    chapters:
+      - file: LL-T1map-generation
+        title: Look-Locker T1 Map Generation
+      - file: looklocker-processing
+        title: Look-Locker Processing
+      - file: mixed-t1map-processing
+        title: Mixed T1 Map Processing
+      - file: comparison-t1map-looklocker-nICE
+        title: "Comparison: T1 Map Look-Locker vs nICE"
+      - file: comparison-t1map-mixed-looklocker
+        title: "Comparison: Mixed vs Look-Locker T1 Maps"
+  
+  - caption: Contrast and Signal Analysis
+    chapters:
+      - file: concentration-estimates
+        title: Concentration Estimates
+      - file: tracer-concentration-estimation
+        title: Tracer Concentration Estimation
+      - file: normalization-of-t1-weighted-images
+        title: Normalization of T1-Weighted Images
+  
+  - caption: Visualization and Analysis
+    chapters:
+      - file: mri-visualization
+        title: MRI Visualization
+      - file: mesh-mapping-error
+        title: Mesh Mapping Error Analysis
+      - file: total-intracranial-content
+        title: Total Intracranial Content

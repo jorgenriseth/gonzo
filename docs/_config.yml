@@ -1,0 +1,67 @@
+# Jupyter Book Configuration
+
+# Book settings
+title: "Gonzo: CSF-Tracer MRI Data Processing Pipeline"
+author: "Jørgen Riseth and Timo Koch"
+logo: ""
+copyright: "2025"
+
+# Force re-execution of notebooks on each build.
+# Set to 'off' for faster builds if notebooks haven't changed
+execute:
+  execute_notebooks: cache
+  timeout: 300
+  allow_errors: false
+
+# Define the name of the latex output file for PDF builds
+latex:
+  latex_documents:
+    targetname: gonzo-docs.tex
+
+# Add a bibtex file so that we can create citations
+bibtex_bibfiles:
+  - references.bib
+
+# Information about where the book exists on the web
+repository:
+  url: https://github.com/jorgenriseth/gonzo
+  path_to_book: docs
+  branch: prepublication-patches
+
+# Add GitHub buttons to your book
+html:
+  use_issues_button: true
+  use_repository_button: true
+  use_edit_page_button: true
+  home_page_in_navbar: true
+  baseurl: https://jorgenriseth.github.io/gonzo/
+
+# Launch button configuration (for Binder, JupyterHub, etc.)
+launch_buttons:
+  notebook_interface: "jupyterlab"
+  binderhub_url: ""
+
+# Parse and render settings
+parse:
+  myst_enable_extensions:
+    - amsmath
+    - colon_fence
+    - deflist
+    - dollarmath
+    - html_admonition
+    - html_image
+    - linkify
+    - replacements
+    - smartquotes
+    - substitution
+    - tasklist
+
+# Sphinx configuration
+sphinx:
+  config:
+    html_theme_options:
+      repository_url: https://github.com/jorgenriseth/gonzo
+      use_repository_button: true
+      use_issues_button: true
+      use_edit_page_button: true
+    language: en

@@ -53,6 +53,8 @@ jupyter_server = "<2"
 seaborn = "*"
 scikit-learn = "*"
 scikit-image = "<0.25"
+jupyter-book = ">=1.0.0,<2"
+ghp-import = ">=2.1.0,<3"
 
 [tool.pixi.pypi-dependencies]
 #gmri2fem = { path = "../gmri2fem/", editable = true }
