@@ -47,11 +47,12 @@ fsl-topup = ">=2203.5,<2204"
 fsl-fdt = ">=2202.11,<2203"
 fsl-bet2 = ">=2111.8,<2112"
 setuptools = ">=79.0.1,<80"
-vtk = ">=9.4.2,<10"
+vtk = "<9.4"
 notebook = "<7"
 jupyter_server = "<2"
 seaborn = "*"
 scikit-learn = "*"
+scikit-image = "<0.25"
 
 [tool.pixi.pypi-dependencies]
 #gmri2fem = { path = "../gmri2fem/", editable = true }
