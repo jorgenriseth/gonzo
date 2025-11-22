@@ -1,16 +1,16 @@
 version: 1
 project:
-  title: 'Gonzo: CSF-Tracer MRI Data Processing Pipeline'
+  title: "Gonzo: CSF-Tracer MRI Data Processing Pipeline"
   authors:
     - name: Jørgen Riseth
     - name: Timo Koch
-  copyright: '2025'
+  copyright: "2025"
   github: jorgenriseth/gonzo
   thebe:
     binder:
       repo: jorgenriseth/gonzo
       provider: github
-      url: 'https://mybinder.org'
+      url: "https://mybinder.org"
       ref: prepublication-patches
   bibliography:
     - references.bib
@@ -24,35 +24,32 @@ project:
       children:
         - file: gonzo-readme-setup.ipynb
           title: Setup Guide
-    - title: Data Extraction and Preprocessing
+    - title: Workflow Examples
       children:
-        - file: gonzo-dicom-extraction.ipynb
-          title: DICOM Extraction
+        - file: normalization-of-t1-weighted-images.ipynb
+          title: T1-Weighted Images
+        - file: looklocker-processing.ipynb
+          title: Look-Locker T1-Maps
+        - file: mixed-t1map-processing.ipynb
+          title: Mixed T1-Maps
+        - file: concentration-estimates.ipynb
+          title: Concentration Estimation
         - file: free-fast-surfer.ipynb
           title: FreeSurfer Processing
-    - title: T1 Mapping
+    - title: Technical Guides (Scratchpads)
       children:
         - file: LL-T1map-generation.ipynb
           title: Look-Locker T1 Map Generation
-          hidden: true
-        - file: looklocker-processing.ipynb
-          title: Look-Locker Processing
-        - file: mixed-t1map-processing.ipynb
-          title: Mixed T1 Map Processing
-        - file: comparison-t1map-looklocker-nICE.ipynb
-          title: 'Comparison: T1 Map Look-Locker vs nICE'
-        - file: comparison-t1map-mixed-looklocker.ipynb
-          title: 'Comparison: Mixed vs Look-Locker T1 Maps'
-    - title: Contrast and Signal Analysis
+        - file: normalization-of-t1-weighted-images-guide.ipynb
+          title: T1-Weighted Images
+    - title: Analysis & Visualization (Scratchpads)
       children:
-        - file: concentration-estimates.ipynb
-          title: Concentration Estimates
         - file: tracer-concentration-estimation.ipynb
           title: Tracer Concentration Estimation
-        - file: normalization-of-t1-weighted-images.ipynb
-          title: Normalization of T1-Weighted Images
-    - title: Visualization and Analysis
-      children:
+        - file: comparison-t1map-looklocker-nICE.ipynb
+          title: "Comparison: T1 Map Look-Locker vs nICE"
+        - file: comparison-t1map-mixed-looklocker.ipynb
+          title: "Comparison: Mixed vs Look-Locker T1 Maps"
         - file: mri-visualization.ipynb
           title: MRI Visualization
         - file: mesh-mapping-error.ipynb
@@ -61,6 +58,6 @@ project:
           title: Total Intracranial Content
 site:
   options:
-    logo: ''
+    logo: ""
     folders: true
   template: book-theme

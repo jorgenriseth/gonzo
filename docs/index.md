@@ -20,9 +20,13 @@ This documentation covers:
   processing.
 - **Concise workflow examples**: Guides on the shell commands required to run
   key parts of the processing pipeline.
-- **Technical guides**: A more technical description of some of the processing
-  steps, such as Look-Locker T1-mapping or normalization of T1-weighted images.
-- **Visualization**: MRI visualization tools and analysis notebooks.
+- **Technical guides (Unpolished)**: A more technical description of some of the
+  processing steps, such as Look-Locker T1-mapping or normalization of
+  T1-weighted images. Most of these are mainly included for transparency, and
+  have not been polished before publication.
+- **Visualization (Unpolished)**: MRI visualization tools and analysis
+  notebooks. These notebooks were mainly used to generate the figure for the
+  article, and might not be of large interest.
 
 ## Getting Started
 
