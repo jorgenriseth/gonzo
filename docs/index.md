@@ -1,10 +1,34 @@
 # Gonzo Documentation
 
-Welcome to the documentation for the **Gonzo** project: Human brain MRI data of CSF-tracer evolution over 72h for data-integrated simulations.
+Welcome to the documentation for the **Gonzo** dataset: Human brain MRI data of
+CSF-tracer evolution over 72h for data-integrated simulations.
 
 ## Overview
 
-This documentation provides comprehensive guides and tutorials for processing and analyzing dynamic contrast-enhanced MRI images following intrathecal injection of gadobutrol in a healthy human subject.
+This documentation provides guidance for how to download the Gonzo dataset. It
+also provides instructions for reproducing the processed data from the raw
+images, by executing the processing pipeline from start-to-finish with
+`snakemake`, or how you could execute most of the individual steps of the
+processing pipeline.
+
+This documentation covers:
+
+- **Setup and Installation**: Step-by-step guide to install dependencies and set
+  up the processing environment.
+- **Data Download**: Downloading the data with a script leveraging the Zenodo
+- **Processing Pipeline**: Complete Snakemake workflow for reproducible data
+  processing.
+- **Concise workflow examples**: Guides on the shell commands required to run
+  key parts of the processing pipeline.
+- **Technical guides**: A more technical description of some of the processing
+  steps, such as Look-Locker T1-mapping or normalization of T1-weighted images.
+- **Visualization**: MRI visualization tools and analysis notebooks.
+
+## Getting Started
+
+Start with the [Setup Guide](gonzo-readme-setup.ipynb) to download the data, or
+to configure your environment and executing the processing pipeline. Then use
+the sidebar to navigate to topics of interest.
 
 ## Dataset Information
 
@@ -12,41 +36,28 @@ This documentation provides comprehensive guides and tutorials for processing an
 - **Data Descriptor**: <https://doi.org/10.5281/zenodo.14266867>
 - **GitHub Repository**: <https://github.com/jorgenriseth/gonzo>
 
-## What's Included
-
-This documentation covers:
-
-- **Setup and Installation**: Step-by-step guide to install dependencies and set up the processing environment
-- **Data Extraction**: DICOM data extraction and conversion workflows
-- **T1 Mapping**: Look-Locker and mixed sequence T1 map generation and validation
-- **Contrast Analysis**: Tracer concentration estimation and signal normalization
-- **Visualization**: MRI visualization tools and analysis notebooks
-- **Processing Pipeline**: Complete Snakemake workflow for reproducible data processing
-
-## Getting Started
-
-If you're new to this project, start with the [Setup Guide](gonzo-readme-setup.ipynb) to configure your environment.
-
-If you're only interested in downloading the processed data, refer to the download instructions in the setup guide.
-
 ## Citation
 
 If you use this data or processing pipeline in your research, please cite:
 
 ```bibtex
-@article{gonzo2025,
-  title={Human brain MRI data of CSF-tracer evolution over 72h for data-integrated simulations},
-  author={Riseth, Jørgen and Koch, Timo},
+@article{riseth2025human,
+  title={Human brain MRI data of CSF tracer evolution over 72h for data-integrated simulations},
+  author={Riseth, J{\o}rgen N and Koch, Timo and Lian, Sofie Lysholm and Stor{\aa}s, Tryggve Holck and Zikatanov, Ludmil T and Valnes, Lars Magnus and Nordengen, Kaja and Mardal, Kent-Andr{\'e}},
+  journal={medRxiv},
+  pages={2025--07},
   year={2025},
-  doi={10.1101/2025.07.23.25331971}
+  publisher={Cold Spring Harbor Laboratory Press}
 }
 ```
 
-## Authors
+## Code Authors
 
 - Jørgen Riseth
 - Timo Koch
 
 ## License
 
-See the [LICENSE](https://github.com/jorgenriseth/gonzo/blob/prepublication-patches/LICENSE) file in the repository for details.
+See the
+[LICENSE](https://github.com/jorgenriseth/gonzo/blob/prepublication-patches/LICENSE)
+file in the repository for details.

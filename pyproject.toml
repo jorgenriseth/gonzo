@@ -53,7 +53,7 @@ jupyter_server = "<2"
 seaborn = "*"
 scikit-learn = "*"
 scikit-image = "<0.25"
-jupyter-book = ">=1.0.0,<2"
+jupyter-book = ">=2.0.0,<3"
 ghp-import = ">=2.1.0,<3"
 
 [tool.pixi.pypi-dependencies]
