@@ -13,9 +13,9 @@ processing pipeline.
 
 This documentation covers:
 
+- **Data Download**: Downloading the data with a script leveraging the Zenodo
 - **Setup and Installation**: Step-by-step guide to install dependencies and set
   up the processing environment.
-- **Data Download**: Downloading the data with a script leveraging the Zenodo
 - **Processing Pipeline**: Complete Snakemake workflow for reproducible data
   processing.
 - **Concise workflow examples**: Guides on the shell commands required to run
@@ -26,7 +26,7 @@ This documentation covers:
   have not been polished before publication.
 - **Visualization (Unpolished)**: MRI visualization tools and analysis
   notebooks. These notebooks were mainly used to generate the figure for the
-  article, and might not be of large interest.
+  article, and are mainly included for transparency.
 
 ## Getting Started
 

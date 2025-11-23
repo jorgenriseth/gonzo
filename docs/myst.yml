@@ -37,8 +37,6 @@ project:
           title: Concentration Estimation
     - title: Analysis & Visualization (Scratchpads)
       children:
-        - file: tracer-concentration-estimation.ipynb
-          title: Tracer Concentration Estimation
         - file: comparison-t1map-looklocker-nICE.ipynb
           title: "Comparison: T1 Map Look-Locker vs nICE"
         - file: comparison-t1map-mixed-looklocker.ipynb
