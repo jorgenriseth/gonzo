@@ -45,7 +45,7 @@ rule orbital_refroi:
       f"mri_processed_data/{{subject}}/registered/{{subject}}_{session}_T1w_registered.nii.gz"
       for session in SESSIONS[wc.subject]
     ],
-    segmentation= "mri_processed_data/{subject}/segmentations/{subject}_seg-aparc+aseg_refined.nii.gz",
+    segmentation= f"{FS_DIR}/{{subject}}/mri/aparc+aseg.mgz"
   output:
     "mri_processed_data/{subject}/segmentations/{subject}_seg-refroi-left-orbital_binary.nii.gz",
     "mri_processed_data/{subject}/segmentations/{subject}_seg-refroi-right-orbital_binary.nii.gz",

@@ -1,0 +1,59 @@
+version: 1
+project:
+  title: "Gonzo: CSF-Tracer MRI Data Processing Pipeline"
+  authors:
+    - name: Jørgen Riseth
+    - name: Timo Koch
+  copyright: "2025"
+  github: jorgenriseth/gonzo
+  thebe:
+    binder:
+      repo: jorgenriseth/gonzo
+      provider: github
+      url: "https://mybinder.org"
+      ref: prepublication-patches
+  bibliography:
+    - docs/references.bib
+  exports:
+    - format: pdf
+      template: plain_latex_book
+      output: docs/exports/gonzo-docs.pdf
+  toc:
+    - file: docs/index.md
+    - title: Getting Started
+      children:
+        - file: docs/download-data.md
+          title: Data Download
+        - file: docs/setup-pipeline.md
+          title: Setup & Running the Pipeline
+    - title: Workflow Examples
+      children:
+        - file: docs/normalization-of-t1-weighted-images.ipynb
+          title: T1-Weighted Images
+        - file: docs/looklocker-processing.ipynb
+          title: Look-Locker T1-Maps
+        - file: docs/mixed-t1map-processing.ipynb
+          title: Mixed T1-Maps
+        - file: docs/free-fast-surfer.ipynb
+          title: FreeSurfer Processing
+        - file: docs/concentration-estimates.ipynb
+          title: Concentration Estimation
+    - title: Analysis & Visualization (Scratchpads)
+      children:
+        - file: docs/comparison-t1map-looklocker-nICE.ipynb
+          title: "Comparison: T1 Map Look-Locker vs nICE"
+        - file: docs/comparison-t1map-mixed-looklocker.ipynb
+          title: "Comparison: Mixed vs Look-Locker T1 Maps"
+        - file: docs/mri-visualization.ipynb
+          title: MRI Visualization
+        - file: docs/mesh-mapping-error.ipynb
+          title: Mesh Mapping Error Analysis
+        - file: docs/total-intracranial-content.ipynb
+          title: Total Intracranial Content
+site:
+  template: book-theme
+  title: "Gonzo: CSF-Tracer MRI Data Processing Pipeline"
+  options:
+    logo: ""
+    logo_text: "Gonzo Documentation"
+    nav_title: "Gonzo"

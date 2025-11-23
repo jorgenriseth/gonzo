@@ -53,11 +53,16 @@ jupyter_server = "<2"
 seaborn = "*"
 scikit-learn = "*"
 scikit-image = "<0.25"
+jupyter-book = ">=2.0.0,<3"
+ghp-import = ">=2.1.0,<3"
 
 [tool.pixi.pypi-dependencies]
 #gmri2fem = { path = "../gmri2fem/", editable = true }
 
 [tool.pixi.tasks]
+docs-build = "jupyter-book build --all ."
+docs-execute-and-build = "bash docs/execute-and-build.sh"
+docs-start = "jupyter-book start ."
 
 [tool.pixi.activation]
 env = { FSLDIR = "$CONDA_PREFIX", FSLOUTPUTTYPE = "NIFTI_GZ", MPLCONFIGDIR = "$CONDA_PREFIX/matplotlib", DIJITSO_CACHE_DIR = "$HOME/.cache" }

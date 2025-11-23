@@ -1,9 +1,8 @@
 use-singularity: True
-singularity-args: " -e --cwd /gonzo -B '$PWD/mri_dataset:/gonzo/mri_dataset,$PWD/mri_processed_data:/gonzo/mri_processed_data'"
+singularity-args:
+  " -e --cwd /gonzo -B
+  '$PWD/mri_dataset:/gonzo/mri_dataset,$PWD/mri_processed_data:/gonzo/mri_processed_data'"
 rerun-incomplete: True
-default-resources:
-  mem_mb: 60000
 set-threads:
-  fastsurfer: 6
-  freesurfer: 6
-
+  fastsurfer: 4
+  freesurfer: 4
