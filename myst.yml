@@ -13,45 +13,47 @@ project:
       url: "https://mybinder.org"
       ref: prepublication-patches
   bibliography:
-    - references.bib
+    - docs/references.bib
   exports:
     - format: pdf
       template: plain_latex_book
-      output: exports/gonzo-docs.pdf
+      output: docs/exports/gonzo-docs.pdf
   toc:
-    - file: index.md
+    - file: docs/index.md
     - title: Getting Started
       children:
-        - file: download-data.md
+        - file: docs/download-data.md
           title: Data Download
-        - file: setup-pipeline.md
+        - file: docs/setup-pipeline.md
           title: Setup & Running the Pipeline
     - title: Workflow Examples
       children:
-        - file: normalization-of-t1-weighted-images.ipynb
+        - file: docs/normalization-of-t1-weighted-images.ipynb
           title: T1-Weighted Images
-        - file: looklocker-processing.ipynb
+        - file: docs/looklocker-processing.ipynb
           title: Look-Locker T1-Maps
-        - file: mixed-t1map-processing.ipynb
+        - file: docs/mixed-t1map-processing.ipynb
           title: Mixed T1-Maps
-        - file: free-fast-surfer.ipynb
+        - file: docs/free-fast-surfer.ipynb
           title: FreeSurfer Processing
-        - file: concentration-estimates.ipynb
+        - file: docs/concentration-estimates.ipynb
           title: Concentration Estimation
     - title: Analysis & Visualization (Scratchpads)
       children:
-        - file: comparison-t1map-looklocker-nICE.ipynb
+        - file: docs/comparison-t1map-looklocker-nICE.ipynb
           title: "Comparison: T1 Map Look-Locker vs nICE"
-        - file: comparison-t1map-mixed-looklocker.ipynb
+        - file: docs/comparison-t1map-mixed-looklocker.ipynb
           title: "Comparison: Mixed vs Look-Locker T1 Maps"
-        - file: mri-visualization.ipynb
+        - file: docs/mri-visualization.ipynb
           title: MRI Visualization
-        - file: mesh-mapping-error.ipynb
+        - file: docs/mesh-mapping-error.ipynb
           title: Mesh Mapping Error Analysis
-        - file: total-intracranial-content.ipynb
+        - file: docs/total-intracranial-content.ipynb
           title: Total Intracranial Content
 site:
+  template: book-theme
+  title: "Gonzo: CSF-Tracer MRI Data Processing Pipeline"
   options:
     logo: ""
-    folders: true
-  template: book-theme
+    logo_text: "Gonzo Documentation"
+    nav_title: "Gonzo"
