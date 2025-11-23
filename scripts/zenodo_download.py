@@ -1,34 +1,19 @@
 import argparse
 import dataclasses
-import os
-import requests
+import json
+from urllib import request
 
 
 @dataclasses.dataclass
 class Settings:
     api_url: str = "https://zenodo.org/api/deposit/depositions/14266867"
-    access_token: str = os.environ.get("ZENODO_ACCESS_TOKEN") or ""
 
 
 def get_file_list(settings: Settings) -> list[dict[str, str]]:
-    if settings.access_token:
-        params = {"access_token": settings.access_token}
-    else:
-        params = {}
-
-    r = requests.get(
-        f"{settings.api_url}/files",
-        params=params,
-    )
-    try:
-        r.raise_for_status()
-    except requests.HTTPError as e:
-        print("-" * 40)
-        print("requires ZENODO_ACCESS_TOKEN, if dataset is not public")
-        print("-" * 40)
-        raise e
-
-    return r.json()
+    url = f"{settings.api_url}/files"
+    
+    with request.urlopen(url) as response:
+        return json.loads(response.read().decode())
 
 
 def find_file_id(filename: str, files: list[dict[str, str]], settings: Settings) -> str:
@@ -45,10 +30,9 @@ def find_file_id(filename: str, files: list[dict[str, str]], settings: Settings)
 
 
 def download_single_file(file_download_url: str, output: str, settings: Settings):
-    r = requests.get(file_download_url, params={"access_token": settings.access_token})
-    r.raise_for_status()
-    with open(output, "wb") as f:
-        f.write(r.content)
+    with request.urlopen(file_download_url) as response:
+        with open(output, "wb") as f:
+            f.write(response.read())
 
 
 def list_all_files(files: list[dict[str, str]]):

@@ -1,9 +1,6 @@
 version: 1
 project:
   title: "Gonzo: CSF-Tracer MRI Data Processing Pipeline"
-  authors:
-    - name: Jørgen Riseth
-    - name: Timo Koch
   copyright: "2025"
   github: jorgenriseth/gonzo
   thebe:
@@ -22,8 +19,10 @@ project:
     - file: index.md
     - title: Getting Started
       children:
-        - file: gonzo-readme-setup.ipynb
-          title: Setup Guide
+        - file: download-data.md
+          title: Data Download
+        - file: setup-pipeline.md
+          title: Setup & Running the Pipeline
     - title: Workflow Examples
       children:
         - file: normalization-of-t1-weighted-images.ipynb
