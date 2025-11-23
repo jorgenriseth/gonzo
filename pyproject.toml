@@ -60,9 +60,9 @@ ghp-import = ">=2.1.0,<3"
 #gmri2fem = { path = "../gmri2fem/", editable = true }
 
 [tool.pixi.tasks]
-docs-build = "cd docs && jupyter-book build --all ."
+docs-build = "jupyter-book build --all ."
 docs-execute-and-build = "bash docs/execute-and-build.sh"
-docs-start = "cd docs && jupyter-book start ."
+docs-start = "jupyter-book start ."
 
 [tool.pixi.activation]
 env = { FSLDIR = "$CONDA_PREFIX", FSLOUTPUTTYPE = "NIFTI_GZ", MPLCONFIGDIR = "$CONDA_PREFIX/matplotlib", DIJITSO_CACHE_DIR = "$HOME/.cache" }
