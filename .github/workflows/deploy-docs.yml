@@ -33,7 +33,7 @@ jobs:
 
       - name: Build Jupyter Book
         run: |
-          jupyter-book build docs
+          jupyter-book build docs --all
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
