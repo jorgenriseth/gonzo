@@ -31,16 +31,10 @@ project:
           title: Look-Locker T1-Maps
         - file: mixed-t1map-processing.ipynb
           title: Mixed T1-Maps
-        - file: concentration-estimates.ipynb
-          title: Concentration Estimation
         - file: free-fast-surfer.ipynb
           title: FreeSurfer Processing
-    - title: Technical Guides (Scratchpads)
-      children:
-        - file: LL-T1map-generation.ipynb
-          title: Look-Locker T1 Map Generation
-        - file: normalization-of-t1-weighted-images-guide.ipynb
-          title: T1-Weighted Images
+        - file: concentration-estimates.ipynb
+          title: Concentration Estimation
     - title: Analysis & Visualization (Scratchpads)
       children:
         - file: tracer-concentration-estimation.ipynb
