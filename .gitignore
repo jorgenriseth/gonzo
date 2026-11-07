@@ -1,4 +1,7 @@
 deps
+envs/rehearsal/
+envs/development/
+envs/release/.pixi/
 build-record/*.zip
 .snakemake
 .sandbox_env

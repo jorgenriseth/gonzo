@@ -1,0 +1,24 @@
+name: Validate pipeline environment
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: prefix-dev/setup-pixi@v0.9.4
+        with:
+          pixi-version: v0.83.0
+          run-install: false
+      - name: Require promoted standalone release environment
+        run: |
+          python3 -m unittest discover -s tests -p 'test_environment_metadata.py'
+          test -f envs/release/pixi.toml || {
+            echo "::error::Release adoption is pending. Generate, lock, and validate envs/release after publishing the locally tested packages."
+            exit 1
+          }
+          test -f envs/release/pixi.lock
+      - run: pixi install --manifest-path envs/release/pixi.toml --locked --run-post-link-scripts
+      - run: pixi run --manifest-path envs/release/pixi.toml --locked python scripts/validate_environment.py
