@@ -12,6 +12,8 @@ def main():
     import dolfin as df
     import numpy as np
     import SVMTK
+    import fenics_io
+    import meshio
     import nibabel as nib
     from click.testing import CliRunner
     from _cli import gmri2fem
@@ -36,6 +38,13 @@ def main():
     surface = SVMTK.Surface()
     surface.make_sphere(0, 0, 0, 1, 0.5)
     assert surface.num_vertices() > 0
+    with tempfile.TemporaryDirectory() as directory:
+        points = np.array([[0., 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1]])
+        cells = [meshio.CellBlock("tetra", np.array([[0, 1, 2, 3]]))]
+        fenics_io.meshio2xdmf(meshio.Mesh(points, cells), Path(directory), dim=3)
+        fenics_io.xdmf2hdf(Path(directory), Path(directory) / "mesh.hdf")
+        domain = fenics_io.read_domain(Path(directory) / "mesh.hdf")
+        assert domain.num_cells() == 1
     assert np.allclose(concentration_from_T1(np.array([1000.]), np.array([1000.]), .0032), 0)
     with tempfile.TemporaryDirectory() as directory:
         root = Path(__file__).resolve().parents[1]

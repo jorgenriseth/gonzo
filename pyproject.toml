@@ -5,7 +5,7 @@ authors = [
   { name = "Timo Koch" },
 ]
 version = "0.1.0"
-requires-python = ">=3.9,<3.12"
+requires-python = ">=3.11,<3.12"
 readme = "README.md"
 license = { file = "LICENSE" }
 dependencies = ["simple-mri>=0.1.6,<0.2"]

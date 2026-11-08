@@ -1,24 +1,26 @@
 # Environment migration and local release rehearsal
 
-The root `pixi.toml` and `pixi.lock` deliberately retain the existing
-editable development setup during this migration. Python package metadata
-remains separately in `pyproject.toml`; Pixi no longer reads its dependencies
-implicitly. The manifest explicitly preserves those environment requirements.
-No packages or images have
+The root `pixi.toml` has two parts. Its shared `[dependencies]` are Gonzo's own
+tools (Snakemake, dcm2niix, Jupyter, docs). The `gmri2fem-dev` feature, which
+the default environment enables, adds the editable sibling gmri2fem checkout
+together with its native stack (FEniCS, SVMTK) and FSL tools. Those feature
+constraints mirror gmri2fem's `conda-recipe/dependencies.toml` and
+`conda-recipe/fsl.toml`; the metadata tests detect drift. Python package
+metadata remains separately in `pyproject.toml`. No packages or images have
 been uploaded. The public channel currently has gmri2fem 0.2.8 and no
 `gmri2fem-fsl`; changing the default now would break installation.
 
-The generated [release candidate](../envs/release/pixi.toml) selects the new
-companion, keeps Gonzo's scientific compatibility caps, and requires Python
-3.11. It has no sibling checkout dependency. Do not treat it as promoted until
-the steps below succeed.
+The generated [release candidate](../envs/release/pixi.toml) is the shared part
+of the root manifest plus the `gmri2fem-fsl` companion, which pulls in the
+released gmri2fem and its FEniCS/SVMTK/FSL dependencies. It has no sibling
+checkout dependency. Do not treat it as promoted until the steps below succeed.
 
-Local resolution, installation, CLI/native smoke checks, and the fixture DAG
-have succeeded against locally built packages. Publication remains blocked by
-the Gmsh Python-metadata mismatch reported by gmri2fem's strict `pip check` gate.
-No checker exception or panta-rhei removal is included in this migration.
-The portable release lock, replacement default/fallback, and container
-promotion remain deferred.
+gmri2fem no longer depends on panta-rhei or Gmsh (its I/O helpers now live in
+gmri2fem's `fenics_io` package), which removes the former Gmsh `pip check`
+publication blocker. Packages built before that change (including any existing
+`gmri2fem/dist/` artifacts) must be rebuilt before rehearsal. The portable
+release lock, replacement default/fallback, and container promotion remain
+deferred.
 
 ## Local release environment
 
@@ -46,19 +48,6 @@ establish full-pipeline numerical equivalence. Compare representative real
 outputs before approving promotion, particularly DTI reorientation and
 downstream tensor/mesh products relative to the 0.2.8 container.
 
-## Independent editable environment
-
-```bash
-python3 scripts/prepare_environment.py --development \
-  --output envs/development/pixi.toml
-pixi install --manifest-path envs/development/pixi.toml --run-post-link-scripts
-```
-
-This uses the sibling checkout and FSL requirements generated from the same
-policy. It does not install the companion, which would pull a released copy
-of gmri2fem into the editable environment. Local paths and locks stay out of
-the default release environment.
-
 ## Promotion after explicit publication approval
 
 1. Publish the tested library/companion artifacts only after reviewing their
@@ -78,9 +67,8 @@ the default release environment.
 3. Commit the canonical manifest, portable lock, and generated Conda fallback
    together. Verify the resolved gmri2fem version/build and absence of editable
    paths. The current fallback YAML remains legacy until this promotion.
-4. Promote the release configuration to root `pixi.toml` and update default
-   installation instructions in the same adoption
-   change, removing handwritten FSL pins and selecting the companion.
+4. Update default installation instructions to the release environment. The
+   root `gmri2fem-dev` feature stays as the editable development setup.
    The environment workflow is manual-only until the portable release lock
    exists; enable PR validation at that point.
 5. Test the container and representative real-data outputs before distributing
