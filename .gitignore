@@ -189,3 +189,5 @@ cython_debug/
 # pixi environments
 .pixi
 *.egg-info
+
+surface_conversion_test_output/

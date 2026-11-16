@@ -530,7 +530,6 @@ environments:
       - conda: https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/public/noarch/fsl-installer-3.17.0-py_0.conda
       - conda: https://fsl.fmrib.ox.ac.uk/fsldownloads/fslconda/public/noarch/fsl-misc_tcl-2406.0-0.tar.bz2
       - pypi: ../gmri2fem
-      - pypi: https://files.pythonhosted.org/packages/13/ea/453089cbc7fb643eb19a34688f040ba2501ce0e275ad47bff7649844e70b/pymeshfix-0.18.1-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/1a/e4/e804505f87627cd8cdae9c010c47c4485fd8c1ce31a7dd0ab7fcc4707377/tifffile-2026.3.3-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/1b/dd/a9fe6a0a09512da23951c68bf36466aeecd89def3183dc095edbc807ddc5/pint-0.25.3-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/1c/b9/ef0df29f7d69dc21def0ab0ddccd7521f08d47c97e01969b90c6611c229e/simple_mri-0.1.6-py3-none-any.whl
@@ -542,6 +541,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/9e/c9/b2622292ea83fbb4ec318f5b9ab867d0a28ab43c5717bb85b0a5f6b3b0a4/networkx-3.6.1-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/a5/2a/e71c1a7d90e70da67b88ccc609bd6ae54798d5847369b15d3a8052232f9d/scikit_image-0.26.0-cp311-cp311-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/a7/03/921a3d3c75785aca9ebfbfcabfbc3a1be12e2ab5265deb026d55a5a3f83e/tqdm-4.70.1-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/af/15/896c602c95330c19f58daf3d49d99586957912a88036362e9003da60c833/pymeshfix-0.17.2-cp311-abi3-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/fe/5e/3be305568fe5f34448807976dc82fc151d76c3e0e03958f34770286278c1/flexparser-0.4-py3-none-any.whl
 packages:
 - conda: https://conda.anaconda.org/bioconda/noarch/snakemake-9.13.6-hdfd78af_0.conda
@@ -7797,7 +7797,7 @@ packages:
   - pandas
   - pint
   - pydicom
-  - pymeshfix
+  - pymeshfix>=0.17.1,<0.18
   - scikit-image>=0.25
   - scipy
   - tqdm
@@ -7806,23 +7806,6 @@ packages:
   - vtk
   - pyvista[all]
   requires_python: '>=3.11,<3.13'
-- pypi: https://files.pythonhosted.org/packages/13/ea/453089cbc7fb643eb19a34688f040ba2501ce0e275ad47bff7649844e70b/pymeshfix-0.18.1-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl
-  name: pymeshfix
-  version: 0.18.1
-  sha256: 134351b50821f0b3c1ed238fc9821b1d290e9eb6856c0d360e3dfda9974eae8d
-  requires_dist:
-  - numpy
-  - sphinx ; extra == 'docs'
-  - pydata-sphinx-theme ; extra == 'docs'
-  - pyvista ; extra == 'docs'
-  - sphinx-gallery ; extra == 'docs'
-  - sphinx-notfound-page>=0.3.0 ; extra == 'docs'
-  - sphinx-copybutton ; extra == 'docs'
-  - pyvista ; extra == 'extras'
-  - pyvista ; extra == 'tests'
-  - pytest ; extra == 'tests'
-  - pytest-cov ; extra == 'tests'
-  requires_python: '>=3.10,<3.15'
 - pypi: https://files.pythonhosted.org/packages/1a/e4/e804505f87627cd8cdae9c010c47c4485fd8c1ce31a7dd0ab7fcc4707377/tifffile-2026.3.3-py3-none-any.whl
   name: tifffile
   version: 2026.3.3
@@ -8185,6 +8168,14 @@ packages:
   - envwrap ; extra == 'telegram'
   - ipywidgets>=6 ; extra == 'notebook'
   requires_python: '>=3.8'
+- pypi: https://files.pythonhosted.org/packages/af/15/896c602c95330c19f58daf3d49d99586957912a88036362e9003da60c833/pymeshfix-0.17.2-cp311-abi3-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl
+  name: pymeshfix
+  version: 0.17.2
+  sha256: ad53f1d21e4611c4f430e1127331e875e296a5c22b5278d12ff3379e840d9490
+  requires_dist:
+  - numpy>1.11.0
+  - pyvista>=0.30.0
+  requires_python: '>=3.9'
 - pypi: https://files.pythonhosted.org/packages/fe/5e/3be305568fe5f34448807976dc82fc151d76c3e0e03958f34770286278c1/flexparser-0.4-py3-none-any.whl
   name: flexparser
   version: '0.4'
