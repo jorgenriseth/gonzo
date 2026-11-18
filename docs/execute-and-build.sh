@@ -1,65 +1,79 @@
 #!/bin/bash
-# Execute all notebooks in the docs directory, then build the book
+set -euo pipefail
 
-DOCS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-cd "$DOCS_DIR"
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+DATA_ROOT="${GONZO_DATA_ROOT:-$ROOT}"
+BUILD_ROOT="$ROOT/_build/documentation"
+TIMEOUT=1200
+PREPARE_ONLY=false
 
-# List of notebooks to skip during execution
-SKIP_NOTEBOOKS=(
-    "gonzo-dicom-extraction.ipynb"
-)
+while [[ $# -gt 0 ]]; do
+	case "$1" in
+		--data-root) DATA_ROOT="${2:?Missing --data-root value}"; shift 2 ;;
+		--build-root) BUILD_ROOT="${2:?Missing --build-root value}"; shift 2 ;;
+		--timeout) TIMEOUT="${2:?Missing --timeout value}"; shift 2 ;;
+		--prepare-only) PREPARE_ONLY=true; shift ;;
+		-h|--help)
+			echo "Usage: $0 [--data-root PATH] [--build-root PATH] [--timeout SECONDS] [--prepare-only]"
+			exit 0 ;;
+		*) echo "Unknown option: $1" >&2; exit 1 ;;
+	esac
+done
 
-echo "======================================"
-echo "Executing Jupyter Notebooks in docs/"
-echo "======================================"
-echo ""
+DATA_ROOT="$(realpath -e "$DATA_ROOT")"
+BUILD_ROOT="$(realpath -m "$BUILD_ROOT")"
+case "$BUILD_ROOT/" in
+	"$ROOT/"|"$DATA_ROOT/"|"$ROOT/docs/"*|"$DATA_ROOT/mri_dataset/"*|"$DATA_ROOT/mri_processed_data/"*)
+		echo "Build directory must be separate from source docs and data directories" >&2
+		exit 1 ;;
+esac
+[[ "$TIMEOUT" =~ ^[1-9][0-9]*$ ]] || { echo "Timeout must be a positive integer" >&2; exit 1; }
+for tree in mri_dataset mri_processed_data; do
+	[[ -d "$DATA_ROOT/$tree" ]] || { echo "Missing data tree: $DATA_ROOT/$tree" >&2; exit 1; }
+	if [[ -e "$BUILD_ROOT/$tree" && ! -L "$BUILD_ROOT/$tree" ]]; then
+		echo "Refusing to replace existing data directory: $BUILD_ROOT/$tree" >&2
+		exit 1
+	fi
+done
 
-# Find all .ipynb files (excluding hidden and build directories)
-notebooks=$(find . -name "*.ipynb" -not -path "./_build/*" -not -path "./.*" | sort)
+mkdir -p "$BUILD_ROOT/docs" "$BUILD_ROOT/figures"
+cp -a "$ROOT/docs/." "$BUILD_ROOT/docs/"
+cp "$ROOT/myst.yml" "$BUILD_ROOT/myst.yml"
+for tree in mri_dataset mri_processed_data; do
+	ln -sfnT "$DATA_ROOT/$tree" "$BUILD_ROOT/$tree"
+done
 
-if [ -z "$notebooks" ]; then
-    echo "No notebooks found to execute."
-else
-    for notebook in $notebooks; do
-        # Extract just the filename
-        notebook_name=$(basename "$notebook")
-        
-        # Check if notebook should be skipped
-        skip=false
-        for skip_nb in "${SKIP_NOTEBOOKS[@]}"; do
-            if [ "$notebook_name" = "$skip_nb" ]; then
-                skip=true
-                break
-            fi
-        done
-        
-        if [ "$skip" = true ]; then
-            echo "⏭️  Skipping: $notebook"
-        else
-            echo "Executing: $notebook"
-            jupyter nbconvert --to notebook --execute --inplace "$notebook" || {
-                echo "⚠️  Warning: Failed to execute $notebook"
-                # Continue with other notebooks even if one fails
-            }
-        fi
-        echo ""
-    done
-fi
+python - "$ROOT/myst.yml" > "$BUILD_ROOT/notebooks.txt" <<'PY'
+from pathlib import Path
+import sys
+import yaml
 
-echo ""
-echo "======================================"
-echo "Building Jupyter Book"
-echo "======================================"
-echo ""
+def toc_files(entries):
+	for entry in entries:
+		if "file" in entry:
+			yield entry["file"]
+		yield from toc_files(entry.get("children", []))
 
-# Stay in docs directory for building
-jupyter-book build --all .
+config = yaml.safe_load(Path(sys.argv[1]).read_text())
+for path in dict.fromkeys(toc_files(config["project"]["toc"])):
+	if Path(path).suffix == ".ipynb":
+		print(path)
+PY
 
-if [ $? -eq 0 ]; then
-    echo ""
-    echo "✅ Done! Book built at docs/_build/html/index.html"
-else
-    echo ""
-    echo "❌ Build failed!"
-    exit 1
+printf 'Data root: %s\nBook workspace: %s\n' "$DATA_ROOT" "$BUILD_ROOT"
+cd "$BUILD_ROOT"
+while IFS= read -r notebook; do
+	jupyter nbconvert --to notebook --inplace --ClearOutputPreprocessor.enabled=True "$notebook"
+	if [[ "$PREPARE_ONLY" == false ]]; then
+		echo "Executing: $notebook"
+		MPLBACKEND=module://matplotlib_inline.backend_inline \
+			jupyter nbconvert --to notebook --execute --inplace \
+				--ExecutePreprocessor.timeout="$TIMEOUT" \
+				--ExecutePreprocessor.kernel_name=python3 "$notebook"
+	fi
+done < "$BUILD_ROOT/notebooks.txt"
+
+if [[ "$PREPARE_ONLY" == false ]]; then
+	jupyter-book build --html --ci
+	echo "HTML build completed under $BUILD_ROOT/_build/html"
 fi
