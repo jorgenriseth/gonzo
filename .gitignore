@@ -1,7 +1,10 @@
 deps
+envs/rehearsal/
+envs/release/.pixi/
 build-record/*.zip
 .snakemake
 .sandbox_env
+apptainer_tmp
 mri_dataset/*
 !mri_dataset/timetable.tsv
 !mri_dataset/blood_concentrations.csv

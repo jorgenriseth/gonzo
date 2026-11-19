@@ -15,6 +15,11 @@ are provided below.
 
 ## Setup
 
+For the staged release/companion migration and separate local-development
+environment, see [environment release instructions](environment-release.md).
+The root [pixi.toml](../pixi.toml) remains the legacy editable setup until publication and
+pipeline validation are approved; the new release candidate is separate.
+
 Install Apptainer with necessary dependencies for setting up user namespaces.
 
 ```bash
