@@ -1,46 +1,17 @@
-# Environment migration and local release rehearsal
+# Pipeline environments
 
-The root `pixi.toml` has two parts. Its shared `[dependencies]` are Gonzo's own
-tools (Snakemake, dcm2niix, Jupyter, docs). The `gmri2fem-dev` feature, which
-the default environment enables, adds the editable sibling gmri2fem checkout
-together with its native stack (FEniCS, SVMTK) and FSL tools. Those feature
-constraints mirror gmri2fem's `conda-recipe/dependencies.toml` and
-`conda-recipe/fsl.toml`; the metadata tests detect drift. Python package
-metadata remains separately in `pyproject.toml`. No packages or images have
-been uploaded. The public channel currently has gmri2fem 0.2.8 and no
-`gmri2fem-fsl`; changing the default now would break installation.
+The root `pixi.toml` and `pixi.lock` define the default pipeline environment.
+It uses the published `gmri2fem-fsl` Conda companion, which installs a
+compatible gmri2fem together with FEniCS, SVMTK, and the supported FSL stack.
+The lock records the exact packages used by the default environment. The
+environment does not require a sibling gmri2fem checkout.
 
-The generated [release candidate](../envs/release/pixi.toml) is the shared part
-of the root manifest plus the `gmri2fem-fsl` companion, which pulls in the
-released gmri2fem and its FEniCS/SVMTK/FSL dependencies. It has no sibling
-checkout dependency. Do not treat it as promoted until the steps below succeed.
-
-gmri2fem no longer depends on panta-rhei or Gmsh (its I/O helpers now live in
-gmri2fem's `fenics_io` package), which removes the former Gmsh `pip check`
-publication blocker. Packages built before that change (including any existing
-`gmri2fem/dist/` artifacts) must be rebuilt before rehearsal. The portable
-release lock, replacement default/fallback, and container promotion remain
-deferred.
-
-## Local release environment
-
-First build the library and companion locally using gmri2fem's
-[release instructions](https://github.com/jorgenriseth/gMRI2FEM/blob/main/docs/releases.md).
-With the sibling repositories checked out, run from Gonzo:
+Use Pixi 0.83.0 from the Gonzo repository:
 
 ```bash
-python3 scripts/prepare_environment.py \
-  --channel ../gmri2fem/dist/conda \
-  --output envs/rehearsal/pixi.toml
-pixi lock --manifest-path envs/rehearsal/pixi.toml
-pixi install --manifest-path envs/rehearsal/pixi.toml --locked --run-post-link-scripts
-pixi run --manifest-path envs/rehearsal/pixi.toml --locked \
-  python scripts/validate_environment.py
+pixi install --locked --run-post-link-scripts
+pixi run --locked python scripts/validate_environment.py
 ```
-
-Use Pixi 0.83.0. The rehearsal lock refers to a local channel and is not a
-portable release lock. Do not commit it. The generator reads FSL requirements
-from gmri2fem's authoritative policy; it does not duplicate their constraints.
 
 The checks exercise CLI loading, native mesh operations, FSL prerequisites,
 and a data-free reference-image DAG from the actual Snakefile. They do not
@@ -48,49 +19,97 @@ establish full-pipeline numerical equivalence. Compare representative real
 outputs before approving promotion, particularly DTI reorientation and
 downstream tensor/mesh products relative to the 0.2.8 container.
 
-## Promotion after explicit publication approval
+In a local installation, `fslchfiletype` and `fslchpixdim` were found with
+interpreter paths from an older environment and shared hardlinks between
+environments. Verify FSL Python wrappers in a clean installation with an
+isolated package cache before relying on them or promoting a container.
 
-1. Publish the tested library/companion artifacts only after reviewing their
-   tests and obtaining approval.
-2. Generate the canonical manifest without a local channel:
+## Editable development
 
-   ```bash
-   python3 scripts/prepare_environment.py --output envs/release/pixi.toml
-   pixi lock --manifest-path envs/release/pixi.toml
-   pixi install --manifest-path envs/release/pixi.toml --locked --run-post-link-scripts
-   pixi run --manifest-path envs/release/pixi.toml --locked \
-     python scripts/validate_environment.py
-   pixi workspace export conda-environment \
-     --manifest-path envs/release/pixi.toml --from-lock-file envs/gonzo.yml
-   ```
-
-3. Commit the canonical manifest, portable lock, and generated Conda fallback
-   together. Verify the resolved gmri2fem version/build and absence of editable
-   paths. The current fallback YAML remains legacy until this promotion.
-4. Update default installation instructions to the release environment. The
-   root `gmri2fem-dev` feature stays as the editable development setup.
-   The environment workflow is manual-only until the portable release lock
-   exists; enable PR validation at that point.
-5. Test the container and representative real-data outputs before distributing
-   a new image. Record the Gonzo commit, package versions, lock checksum, image
-   digest, and Greedy version.
-
-To check manifest drift while both repositories are available:
+To develop gmri2fem alongside Gonzo, check out gmri2fem as a sibling repository.
+First save the current root manifest and lock, including any local changes:
 
 ```bash
-python3 scripts/prepare_environment.py --output envs/release/pixi.toml --check
-python3 -m unittest discover -s tests -p 'test_environment_metadata.py'
+backup_dir=$(mktemp -d)
+cp -p pixi.toml pixi.lock "$backup_dir/"
+printf 'Saved environment files in %s\n' "$backup_dir"
 ```
 
-Conda's exported YAML is a convenience installation route; the Pixi lock
-records more precise artifact identities. Never hand-edit either generated file.
+Temporarily remove `gmri2fem-fsl` from the root `[dependencies]` and add the
+native and FSL requirements below to that same table. These values reflect the
+current gmri2fem policies; check `conda-recipe/dependencies.toml` and
+`conda-recipe/fsl.toml` in the sibling checkout for changes first.
+
+```toml
+fenics = ">=2019.2.0.dev20240219,<2020"
+svmtk = ">=2.0.1,<3"
+h5py = ">=3,<4"
+pyvista = ">=0.44,<0.45"
+vtk = "<9.4"
+fsl-eddy = ">=2401.2,<2402"
+fsl-topup = ">=2203.5,<2204"
+fsl-fdt = ">=2202.11,<2203"
+fsl-bet2 = ">=2111.8,<2112"
+fsl-avwutils = "==2209.3"
+```
+
+Add this separate top-level table, adjusting the path if the checkout is not a
+sibling. Do not retain `gmri2fem-fsl`: it would pull in the published library.
+
+```toml
+[pypi-dependencies]
+gmri2fem = { path = "../gmri2fem", editable = true }
+```
+
+Resolve and validate the temporary environment:
+
+```bash
+pixi lock
+pixi install --locked --run-post-link-scripts
+pixi run --locked python scripts/validate_environment.py
+```
+
+This changes the root lock and installed default environment. Do not commit the
+temporary manifest or lock. When finished, restore the saved files only after
+checking for other changes made since the backup, then reinstall the released
+environment:
+
+```bash
+cp -p "$backup_dir/pixi.toml" "$backup_dir/pixi.lock" .
+pixi install --locked --run-post-link-scripts
+```
+
+## Conda fallback
+
+The Conda YAML is an export of the root Pixi lock. Regenerate it after changing
+the lock; do not edit it by hand:
+
+```bash
+pixi workspace export conda-environment --from-lock-file envs/gonzo.yml
+conda env create -f envs/gonzo.yml
+```
+
+The Pixi lock records more precise artifact identities. Verify the Conda
+environment and FSL activation separately before using this fallback.
+
+## Local release rehearsal
+
+First build the library and companion locally using gmri2fem's
+[release instructions](https://github.com/jorgenriseth/gMRI2FEM/blob/main/README.md#contributors-and-release-maintainers).
+Save the root manifest and lock as described above, then temporarily prepend
+the absolute `file://` URL of `../gmri2fem/dist/conda` to the root workspace
+channels. Set `gmri2fem-fsl` and `gmri2fem` in `[dependencies]` to the versions
+of the locally built artifacts, so the intended library is selected even if the
+companion supports multiple versions. Run the same lock, install, and
+validation commands as above; inspect the lock to confirm both artifacts came
+from the local channel. Restore the saved files and reinstall afterward. Do not
+commit the local-channel manifest or lock.
 
 ## Container
 
-The Dockerfile now requires the promoted release manifest and lock, and pins
-the Pixi base image to the version that matches the lock format. Greedy is downloaded from SourceForge's nightly
-URL as before, so it is not pinned: record the version printed by
-`greedy -version` for each built image.
+The Dockerfile installs the root locked environment and runs non-root smoke
+tests. Greedy is downloaded from SourceForge's nightly URL, so record the
+version printed by `greedy -version` for each built image.
 
 ```bash
 docker build -f docker/Dockerfile -t gonzo:rehearsal .
@@ -100,6 +119,7 @@ Image construction runs non-root environment
 smoke tests. Do not update the existing SIF or pipeline container reference
 until those tests and real-data validation pass. Fetch images by immutable
 tag/digest rather than assuming today's `latest` matches an existing SIF.
+Record the Gonzo commit, package versions, lock checksum, and image digest.
 
 For inspection, avoid resolving the host's manifest through Apptainer:
 

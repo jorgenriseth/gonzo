@@ -16,8 +16,7 @@ RUN wget https://sourceforge.net/projects/greedy-reg/files/Nightly/greedy-nightl
   && rm greedy.tar.gz
 
 WORKDIR /gonzo
-# This environment is generated and validated before image promotion.
-COPY envs/release/pixi.toml envs/release/pixi.lock ./
+COPY pixi.toml pixi.lock ./
 RUN pixi install --locked --run-post-link-scripts
 
 COPY Snakefile snakeconfig.yaml ./

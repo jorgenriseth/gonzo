@@ -1,6 +1,6 @@
 [workspace]
 name = "gonzo"
-version = "0.1.0"
+version = "0.1.1"
 channels = [
   "conda-forge/label/fenics-dev",
   "conda-forge",
@@ -24,27 +24,7 @@ seaborn = "*"
 scikit-learn = "*"
 jupyter-book = ">=2.0.0,<3"
 ghp-import = ">=2.1.0,<3"
-
-# Editable sibling checkout of gmri2fem. Its Python requirements are read from
-# its metadata; the conda-only parts mirror gmri2fem's conda recipe
-# (conda-recipe/dependencies.toml and conda-recipe/fsl.toml).
-[feature.gmri2fem-dev.dependencies]
-fenics = ">=2019.2.0.dev20240219,<2020"
-svmtk = ">=2.0.1,<3"
-h5py = ">=3,<4"
-pyvista = ">=0.44,<0.45"
-vtk = "<9.4"
-fsl-eddy = ">=2401.2,<2402"
-fsl-topup = ">=2203.5,<2204"
-fsl-fdt = ">=2202.11,<2203"
-fsl-bet2 = ">=2111.8,<2112"
-fsl-avwutils = "==2209.3"
-
-[feature.gmri2fem-dev.pypi-dependencies]
-gmri2fem = { path = "../gmri2fem/", editable = true }
-
-[environments]
-default = ["gmri2fem-dev"]
+gmri2fem-fsl = "==0.1.0"
 
 [tasks]
 docs-build = "jupyter-book build --all ."

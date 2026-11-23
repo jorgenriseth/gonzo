@@ -10,12 +10,9 @@ This repository contains the processing pipeline for the Gonzo dataset: dynamic 
 
 ## Quick Start
 
-The pipeline environment and tasks are defined in [pixi.toml](pixi.toml),
-separately from the Python package metadata.
-
-The build/environment migration is staged locally. See
-[release environment preparation](docs/environment-release.md) for standalone
-release and editable-development routes, validation gates, and container builds.
+The root [pixi.toml](pixi.toml) and lock define the pipeline environment using
+released gmri2fem packages. See [environment setup](docs/environment-release.md)
+for temporary editable-development changes, validation gates, and container builds.
 
 For detailed instructions on data download, setup, and running the pipeline, please visit the [documentation](https://jorgenriseth.github.io/gonzo).
 
