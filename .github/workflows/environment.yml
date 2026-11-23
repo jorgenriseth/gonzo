@@ -13,8 +13,11 @@ jobs:
         with:
           pixi-version: v0.83.0
           run-install: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
       - name: Check environment metadata
         run: |
-          python3 -m unittest discover -s tests -p 'test_environment_metadata.py'
+          python -m unittest discover -s tests -p 'test_environment_metadata.py'
       - run: pixi install --locked --run-post-link-scripts
       - run: pixi run --locked python scripts/validate_environment.py
