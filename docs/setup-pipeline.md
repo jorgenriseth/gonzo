@@ -15,6 +15,10 @@ are provided below.
 
 ## Setup
 
+The root [pixi.toml](../pixi.toml) uses released gmri2fem packages. For
+temporary editable-development changes and validation status, see the
+[environment instructions](environment-release.md).
+
 Install Apptainer with necessary dependencies for setting up user namespaces.
 
 ```bash

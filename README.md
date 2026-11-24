@@ -10,6 +10,10 @@ This repository contains the processing pipeline for the Gonzo dataset: dynamic 
 
 ## Quick Start
 
+The root [pixi.toml](pixi.toml) and lock define the pipeline environment using
+released gmri2fem packages. See [environment setup](docs/environment-release.md)
+for temporary editable-development changes, validation gates, and container builds.
+
 For detailed instructions on data download, setup, and running the pipeline, please visit the [documentation](https://jorgenriseth.github.io/gonzo).
 
 ## Citation
@@ -26,4 +30,3 @@ If you use this data or processing pipeline in your research, please cite
   publisher={Cold Spring Harbor Laboratory Press}
 }
 ```
-

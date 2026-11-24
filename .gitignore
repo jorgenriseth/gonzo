@@ -1,7 +1,10 @@
 deps
+envs/rehearsal/
+envs/release/.pixi/
 build-record/*.zip
 .snakemake
 .sandbox_env
+apptainer_tmp
 mri_dataset/*
 !mri_dataset/timetable.tsv
 !mri_dataset/blood_concentrations.csv
@@ -186,3 +189,5 @@ cython_debug/
 # pixi environments
 .pixi
 *.egg-info
+
+surface_conversion_test_output/
